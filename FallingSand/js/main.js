@@ -27,6 +27,7 @@ app.main = {
 	imageData: undefined,
 	data: undefined,
 	rawData: undefined,
+	sandColor: "#EBEFA0",
 
 
 	
@@ -46,8 +47,13 @@ app.main = {
 		this.ctx.fillRect(0,0,this.WIDTH,this.HEIGHT); 
 		
 		this.canvas.onmousedown = this.doMousedown.bind(this);
+		
+		this.sandColor= "#EBEFA0";
+		
+		this.setupUI();
 
-		// start the game loop
+		
+		// start the scene loop
 		this.update();
 	},
 	
@@ -82,13 +88,9 @@ app.main = {
 						//check if there is an object below
 						if(this.isBlack(this.rawData, (i + this.WIDTHPIX)))
 						{
-							this.data[i+this.WIDTHPIX] = this.rawData[i];
-							this.data[i+this.WIDTHPIX+1] = this.rawData[i+1];
-							this.data[i+this.WIDTHPIX+2] = this.rawData[i+2];
 							
-							this.data[i] = 0;
-							this.data[i+1] = 0;
-							this.data[i+2] = 0;
+							this.moveParticle(i, this.rawData, (i+this.WIDTHPIX), this.data);
+							
 						}
 						
 						//check sides
@@ -102,13 +104,9 @@ app.main = {
 								{
 									if(this.isBlack(this.data, (i-4)))//(this.data[i-4] == 0) && (this.data[i-3] == 0) && (this.data[i-2] == 0))
 									{
-										this.data[i-4] = this.rawData[i];
-										this.data[i-3] = this.rawData[i+1];
-										this.data[i-2] = this.rawData[i+2];
 										
-										this.data[i] = 0;
-										this.data[i+1] = 0;
-										this.data[i+2] = 0;
+										this.moveParticle(i, this.rawData, (i-4), this.data);
+										
 									}
 									
 								}
@@ -119,13 +117,9 @@ app.main = {
 								{
 									if(this.isBlack(this.data, (i+4)))//t(this.data[i+4] == 0) && (this.data[i+5] == 0) && (this.data[i+6] == 0))
 									{
-										this.data[i+4] = this.rawData[i];
-										this.data[i+5] = this.rawData[i+1];
-										this.data[i+6] = this.rawData[i+2];
 										
-										this.data[i] = 0;
-										this.data[i+1] = 0;
-										this.data[i+2] = 0;
+										this.moveParticle(i, this.rawData, (i+4), this.data);
+										
 									}
 									
 								}
@@ -136,10 +130,7 @@ app.main = {
 					
 					
 				}
-				//data[i];
-				//data[i+1];
-				//data[i+2];
-				//data[i+3];
+				
 			}
 			//console.log("updated");
 		//}
@@ -185,15 +176,18 @@ app.main = {
 	{
 		
 		
-
 		var mouse = getMouse(e);
 		
-		this.ctx.fillStyle = "#EBEFA0";
-		this.ctx.fill
+		this.ctx.fillStyle = this.sandColor;//"#EBEFA0";
+		console.log("sandColor whilesetting fillStyle: " + this.sandColor);
+
 		//this.ctx.fillRect(mouse.x,mouse.y,1,1);
-		this.ctx.beginPath();
-		this.ctx.arc(mouse.x,mouse.y,30,0,2*Math.PI);
-		this.ctx.fill();
+		
+		this.ctx.fillRect(mouse.x - 15, mouse.y - 15, 30, 30);
+		
+		//this.ctx.beginPath();
+		//this.ctx.arc(mouse.x,mouse.y,30,0,2*Math.PI);
+		//this.ctx.fill();
 
 	},
 	
@@ -227,7 +221,32 @@ app.main = {
 	},
 	
 	
+	//move particle (this moves it then erases the old space)
+	moveParticle: function(startIndex, startarray, destinationIndex, destinationArray)
+	{
+		//the new array gets the move changes
+		destinationArray[destinationIndex] = startarray[startIndex];
+		destinationArray[destinationIndex+1] = startarray[startIndex+1];
+		destinationArray[destinationIndex+2] = startarray[startIndex+2];
+		
+		//the old position is cleared in the new array
+		destinationArray[startIndex] = 0;
+		destinationArray[startIndex+1] = 0;
+		destinationArray[startIndex+2] = 0;
+	},
 	
+	setSandColor: function(color)
+	{
+		this.sandColor = color;
+	},
 	
+	setupUI: function()
+	{
+		document.querySelector("#sandType").onchange = function(e){
+				//this.sandColor = e.target.value;
+				this.setSandColor(e.target.value);
+				console.log("sandColor after change: " + this.sandColor);
+			};
+	},
 	
 }; // end app.main
