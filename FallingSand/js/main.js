@@ -74,14 +74,13 @@ app.main = {
 			for(var i = 0; i < this.data.length; i += 4)
 			{
 				//if position has a color
-				if(!this.isBlack(this.rawData, i))//(this.rawData[i] != 0) || (this.rawData[i+1] != 0) || (this.rawData[i+2] != 0))
+				if(!this.isBlack(this.rawData, i))
 				{
-					//this will be replaced with a call to in boundry check
 					//position bellow exists
-					if((this.rawData.length + this.WIDTHPIX) < ((this.WIDTH * 4) * (this.HEIGHT * 4)))
+					if(this.positionExists(i + this.WIDTHPIX))
 					{
 						//check if there is an object below
-						if(this.isBlack(this.rawData, (i + this.WIDTHPIX)))//(this.rawData[i+this.WIDTHPIX] == 0) && (this.rawData[i+1+this.WIDTHPIX] == 0) && (this.rawData[i+2+this.WIDTHPIX] == 0))
+						if(this.isBlack(this.rawData, (i + this.WIDTHPIX)))
 						{
 							this.data[i+this.WIDTHPIX] = this.rawData[i];
 							this.data[i+this.WIDTHPIX+1] = this.rawData[i+1];
@@ -99,9 +98,9 @@ app.main = {
 							//try to move left or right
 							if(Math.floor((Math.random() * 2)) == 1)
 							{
-								if((this.rawData[i-4] == 0) && (this.rawData[i-3] == 0) && (this.rawData[i-2] == 0))
+								if(this.isBlack(this.rawData, i-4))//(this.rawData[i-4] == 0) && (this.rawData[i-3] == 0) && (this.rawData[i-2] == 0))
 								{
-									if((this.data[i-4] == 0) && (this.data[i-3] == 0) && (this.data[i-2] == 0))
+									if(this.isBlack(this.data, (i-4)))//(this.data[i-4] == 0) && (this.data[i-3] == 0) && (this.data[i-2] == 0))
 									{
 										this.data[i-4] = this.rawData[i];
 										this.data[i-3] = this.rawData[i+1];
@@ -116,9 +115,9 @@ app.main = {
 							}
 							else
 							{
-								if((this.rawData[i+4] == 0) && (this.rawData[i+5] == 0) && (this.rawData[i+6] == 0))
+								if(this.isBlack(this.rawData, i+4))//(this.rawData[i+4] == 0) && (this.rawData[i+5] == 0) && (this.rawData[i+6] == 0))
 								{
-									if((this.data[i+4] == 0) && (this.data[i+5] == 0) && (this.data[i+6] == 0))
+									if(this.isBlack(this.data, (i+4)))//t(this.data[i+4] == 0) && (this.data[i+5] == 0) && (this.data[i+6] == 0))
 									{
 										this.data[i+4] = this.rawData[i];
 										this.data[i+5] = this.rawData[i+1];
@@ -200,19 +199,19 @@ app.main = {
 	
 	
 	
-	positionExists: function(fromRight, indexToCheck)
+	positionExists: function(indexToCheck)
 	{
 		if(indexToCheck != undefined)
 		{
-			//if this block works it will be a miracle
-			if(((fromRight == true) && ((indexToCheck % WIDTH) == (WIDTH - 1))) || (((fromRight == false) && ((indexToCheck % WIDTH) == (0)))))
-			{
-				return false;
-			}
-			else
-			{
-				return true;
-			}
+			//if((indexToCheck % this.WIDTHPIX) == (this.WIDTHPIX - 1) || ((indexToCheck % this.WIDTHPIX) == (0)))
+			//{
+			//	return false;
+			//}
+			//else
+			//{
+			//	return true;
+			//}
+			return true;
 		}
 		else
 		{
