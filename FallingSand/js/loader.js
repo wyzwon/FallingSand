@@ -26,11 +26,11 @@ window.onload = function(){
 window.onblur = function()
 {
 	console.log("blur at " + Date());
-	//app.main.pauseGame();
+	app.main.pauseGame();
 };
 
 window.onfocus = function()
 {
 	console.log("focus at " + Date());
-	//app.main.resumeGame();
+	app.main.resumeGame();
 };

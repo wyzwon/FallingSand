@@ -13,7 +13,7 @@ var app = app || {};
 
 app.main = {
 	//properties
-	//paused: false,
+	paused: false,
 	animationID: 0,
 	
     WIDTH : 600, 
@@ -69,8 +69,13 @@ app.main = {
 
 	 	this.animationID = requestAnimationFrame(this.update.bind(this));
 	 	
-
+		if(this.paused)
+		{
+			//this.drawPauseScreen(this.ctx);
+			return;
+		}
 	 	
+		
 	 	var dt = this.calculateDeltaTime();
 	 	 
 
@@ -434,6 +439,39 @@ app.main = {
 		this.data[index] = 0;
 		this.data[index+1] = 0;
 		this.data[index+2] = 0;
+	},
+	
+	pauseGame: function()
+	{
+		this.paused = true;
+		
+		
+		cancelAnimationFrame(this.animationID);
+		
+		
+		this.update();
+	},
+	
+	resumeGame: function()
+	{
+		cancelAnimationFrame(this.animationID);
+		
+		this.paused = false;
+		
+		this.update();
+	},
+	
+	drawPauseScreen: function(ctx)
+	{
+		ctx.save();
+		ctx.fillStyle = "black";
+		//ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
+		ctx.textAlign = "center";
+		ctx.textBaseline = "middle";
+		//ctx.fillText(this.ctx, "... PAUSED ...", this.WIDTH/2, this.HEIGHT/2, "40pt courier", "white");
+		
+		//ctx.fillText(this.ctx, "By Thomas Bouffard", this.WIDTH/2, (3 * this.HEIGHT/4), "30pt courier", "white");
+		ctx.restore();
 	}
 	
 }; // end app.main
