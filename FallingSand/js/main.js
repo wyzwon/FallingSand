@@ -1,8 +1,7 @@
 // main.js
 // Dependencies: 
 // Description: singleton object
-// This object will be our main "controller" class and will contain references
-// to most of the other objects in the game.
+// This object handles all the main functionality of the scene
 
 "use strict";
 
@@ -320,6 +319,10 @@ app.main = {
 			return false;
 		}
 		else if(this.isBlack(array, index))
+		{
+			return false;
+		}
+		else if(array[index] == 0 && array[index + 1] == 255)
 		{
 			return false;
 		}
