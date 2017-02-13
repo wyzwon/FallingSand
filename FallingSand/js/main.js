@@ -111,8 +111,10 @@ app.main = {
 								//attempt to sink
 								else if(this.isFluid(this.below(i), this.rawData) && this.isDenser(i, this.rawData, this.below(i))) //if the particle below is fluid and less dense
 								{
-	
-									this.switchCells(i, this.rawData, this.below(i), this.data);
+									if(Math.floor((Math.random() * 2)) == 1) //makes sinking look better by slowing it down
+									{
+										this.switchCells(i, this.rawData, this.below(i), this.data);
+									}
 									
 								}
 								
