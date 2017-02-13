@@ -71,7 +71,6 @@ app.main = {
 	 	
 		if(this.paused)
 		{
-			//this.drawPauseScreen(this.ctx);
 			return;
 		}
 	 	
@@ -164,7 +163,6 @@ app.main = {
 		this.ctx.putImageData(this.imageData, 0, 0);
 		
 
-		//console.log(this.animationID);
 	
 
 	
@@ -207,9 +205,7 @@ app.main = {
 
 		
 		
-		//this.ctx.beginPath();
-		//this.ctx.arc(mouse.x,mouse.y,30,0,2*Math.PI);
-		//this.ctx.fill();
+
 
 	},
 	
@@ -225,9 +221,7 @@ app.main = {
 		
 
 		this.ctx.fillStyle = this.sandColor;
-		//this.ctx.lineWidth = lineWidth;
-		
-		//this.ctx.lineTo(mouse.x + 0.5,mouse.y + 0.5);
+
 		this.ctx.fillRect(mouse.x - (this.penSize / 2), mouse.y - (this.penSize / 2), this.penSize, this.penSize);
 		
 		this.ctx.stroke();
@@ -250,25 +244,6 @@ app.main = {
 	positionExists: function(indexToCheck)
 	{
 		return( indexToCheck < this.rawData.length);
-		
-		//code snippet saved to block wrap around if I feel it should be done
-		
-		/*if(indexToCheck != undefined)
-		{
-			if((indexToCheck % this.WIDTHPIX) == (this.WIDTHPIX - 1) || ((indexToCheck % this.WIDTHPIX) == (0)))
-			{
-				return false;
-			}
-			else
-			{
-				return true;
-			}
-			return true;
-		}
-		else
-		{
-			return false;
-		}*/
 	},
 	
 	//checks if black
@@ -304,12 +279,15 @@ app.main = {
 		document.querySelector("#sandType").onchange = function(e){
 
 				this.sandColor = e.target.value;
-				//console.log("sandColor after change: " + this.sandColor);
 			}.bind(this);
 			
 		document.querySelector("#PenSize").onchange = function(e){
 				this.penSize = e.target.value;
 			}.bind(this);
+			
+		document.querySelector("#clearButton").onclick = function(e){
+			this.clearScene();
+		}.bind(this);
 	},
 	
 	//swap two given cells
@@ -326,7 +304,6 @@ app.main = {
 		array2[index2+1] = array1[index1+1];
 		array2[index2+2] = array1[index1+2];
 		array2[index2+3] = array1[index1+3];
-		//debugger;
 	},
 	
 	
@@ -472,6 +449,14 @@ app.main = {
 		
 		//ctx.fillText(this.ctx, "By Thomas Bouffard", this.WIDTH/2, (3 * this.HEIGHT/4), "30pt courier", "white");
 		ctx.restore();
+	},
+	
+	clearScene: function()
+	{
+		this.ctx.save();
+		this.ctx.fillStyle = "black";
+		this.ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
+		this.ctx.restore();
 	}
 	
 }; // end app.main
