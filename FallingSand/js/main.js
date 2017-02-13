@@ -81,56 +81,72 @@ app.main = {
 			{
 				//if position has a color
 				if(!this.isBlack(this.rawData, i))
-				{0
-					if(this.isFluid(i,this.rawData))
+				{
+					if((this.rawData[i] == this.data[i]) && (this.rawData[i+1] == this.data[i+1]) && (this.rawData[i+2] == this.data[i+2]))
 					{
-						//position bellow exists
-						if(this.positionExists(i + this.WIDTHPIX))
+						//if the focused particle is fluid
+						if(this.isFluid(i,this.rawData))
 						{
-							//check if there is an object below
-							if(this.isBlack(this.rawData, (i + this.WIDTHPIX)))
+							//position below exists
+							if(this.positionExists(this.below(i), this.rawData))
 							{
-								
-								this.moveParticle(i, this.rawData, (i+this.WIDTHPIX), this.data);
-								
-							}
-							
-							//check sides
-							else
-							{
-	
-								//try to move left or right
-								if(Math.floor((Math.random() * 2)) == 1)
+								//check if space below is empty
+								if(this.isBlack(this.rawData, this.below(i)))
 								{
-									if(this.isBlack(this.rawData, i-4))//(this.rawData[i-4] == 0) && (this.rawData[i-3] == 0) && (this.rawData[i-2] == 0))
-									{
-										if(this.isBlack(this.data, (i-4)))//(this.data[i-4] == 0) && (this.data[i-3] == 0) && (this.data[i-2] == 0))
-										{
-											
-											this.moveParticle(i, this.rawData, (i-4), this.data);
-											
-										}
-										
-									}
+									
+									this.moveParticle(i, this.rawData, this.below(i), this.data);
+									
 								}
+								
+								
+								//attempt to sink
+								else if(this.isFluid(this.below(i), this.rawData) && this.isDenser(i, this.rawData, this.below(i))) //if the particle below is fluid and less dense
+								{
+	
+									this.switchCells(i, this.rawData, this.below(i), this.data);
+									
+								}
+								
+								//check sides
 								else
 								{
-									if(this.isBlack(this.rawData, i+4))//(this.rawData[i+4] == 0) && (this.rawData[i+5] == 0) && (this.rawData[i+6] == 0))
+		
+									//try to move left or right
+									if(Math.floor((Math.random() * 2)) == 1)
 									{
-										if(this.isBlack(this.data, (i+4)))//t(this.data[i+4] == 0) && (this.data[i+5] == 0) && (this.data[i+6] == 0))
+										if(this.isBlack(this.rawData, i-4))//(this.rawData[i-4] == 0) && (this.rawData[i-3] == 0) && (this.rawData[i-2] == 0))
 										{
-											
-											this.moveParticle(i, this.rawData, (i+4), this.data);
+											if(this.isBlack(this.data, (i-4)))//(this.data[i-4] == 0) && (this.data[i-3] == 0) && (this.data[i-2] == 0))
+											{
+												
+												this.moveParticle(i, this.rawData, (i-4), this.data);
+												
+											}
 											
 										}
-										
+									}
+									else
+									{
+										if(this.isBlack(this.rawData, i+4))//(this.rawData[i+4] == 0) && (this.rawData[i+5] == 0) && (this.rawData[i+6] == 0))
+										{
+											if(this.isBlack(this.data, (i+4)))//t(this.data[i+4] == 0) && (this.data[i+5] == 0) && (this.data[i+6] == 0))
+											{
+												
+												this.moveParticle(i, this.rawData, (i+4), this.data);
+												
+											}
+											
+										}
 									}
 								}
 							}
+							else
+							{
+								console.log("position below does not exist");
+							}
 						}
+					
 					}
-					
-					
 				}
 				
 			}
@@ -181,7 +197,7 @@ app.main = {
 		var mouse = getMouse(e);
 		
 		this.ctx.fillStyle = this.sandColor;//"#EBEFA0";
-		console.log("sandColor whilesetting fillStyle: " + this.sandColor);
+		//console.log("sandColor whilesetting fillStyle: " + this.sandColor);
 
 		//this.ctx.fillRect(mouse.x,mouse.y,1,1);
 		
@@ -194,25 +210,31 @@ app.main = {
 	},
 	
 	
-	
+	//check if the position physically exists in the array
 	positionExists: function(indexToCheck)
 	{
-		if(indexToCheck != undefined)
+		return( indexToCheck < this.rawData.length);
+		
+		//return (this.rawData[indexToCheck] != undefined);
+		
+		//code snippet saved to block wrap around if I feel it should be done
+		
+		/*if(indexToCheck != undefined)
 		{
-			//if((indexToCheck % this.WIDTHPIX) == (this.WIDTHPIX - 1) || ((indexToCheck % this.WIDTHPIX) == (0)))
-			//{
-			//	return false;
-			//}
-			//else
-			//{
-			//	return true;
-			//}
+			if((indexToCheck % this.WIDTHPIX) == (this.WIDTHPIX - 1) || ((indexToCheck % this.WIDTHPIX) == (0)))
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
 			return true;
 		}
 		else
 		{
 			return false;
-		}
+		}*/
 	},
 	
 	//checks if black
@@ -248,20 +270,37 @@ app.main = {
 		document.querySelector("#sandType").onchange = function(e){
 
 				this.sandColor = e.target.value;
-				console.log("sandColor after change: " + this.sandColor);
+				//console.log("sandColor after change: " + this.sandColor);
 			}.bind(this);
 	},
 	
 	//swap two given cells
 	switchCells: function(index1, array1, index2, array2 )
 	{
+		// temp = new array["array1[" + index1 + "]","array1[" + (index1+1) + "]","array1[" + (index1+2) + "]","array1[" + (index1+3) + "]"];
 		
+		//var temp1 = array1[index1];
+		//var temp2 = array1[index1 + 1];
+		//var temp3 = array1[index1 + 2];
+		//var temp4 = array1[index1 + 3];
+		
+		array2[index1] = array1[index2];
+		array2[index1+1] = array1[index2+1];
+		array2[index1+2] = array1[index2+2];
+		array2[index1+3] = array1[index2+3];
+		
+		array2[index2] = array1[index1];
+		array2[index2+1] = array1[index1+1];
+		array2[index2+2] = array1[index1+2];
+		array2[index2+3] = array1[index1+3];
+		//debugger;
 	},
 	
 	
 	isFluid: function(index,array)
 	{
-		var foo = array[index];
+		return (!(array[index] == 136)); //use till there are more solids
+		/*var foo = array[index];
 		if(array[index] == 136) //hex 88 -> dec 136
 		{
 			return false;
@@ -269,7 +308,59 @@ app.main = {
 		else
 		{
 			return true;
-		}
+		}*/
 	},
 	
+	getDensity: function(rValue, gValue, bValue)
+	{
+		if(rValue > 0)
+		{
+			if(rValue == 235)//sand //hex EB == dec 235
+			{
+				return 3;
+			}
+			else //assume salt water
+			{
+				return 2
+			}
+		}
+		else if (bValue > 0)
+		{
+			if(gValue > 0) //salt
+			{
+				return 3;
+			}
+			else//assume water
+			{
+				return 1;
+			}
+		}
+		else
+		{
+			return 0;//unknown but hey let it float
+		}
+		
+	},
+	
+	//declare if object one is denser then object two
+	isDenser: function(index1, array, index2) // object1 array object2
+	{
+		return(this.getDensity(array[index1], array[index1+1], array[index1+2]) > this.getDensity(array[index2], array[index2+1], array[index2+2]));
+	},
+	
+	//returns the index below focused cells
+	below: function(i)
+	{
+		return (i + this.WIDTHPIX);
+	}
+	
 }; // end app.main
+
+
+//density layers (higher is lighter)
+
+
+//water 1
+//salt water 1.027
+//sand 1.920
+//salt 2.17
