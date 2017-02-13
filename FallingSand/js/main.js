@@ -124,24 +124,41 @@ app.main = {
 						//check sides to make sure they exist then try to move left or right randomly
 						if((i > 0) && Math.floor((Math.random() * 2)) == 1)
 						{
-							if(this.isBlack(this.rawData, i-4) || this.isFluid(i-4, this.rawData))
+							if(this.isFluidOrVoid(i-4, this.rawData))
 							{
-								if((Math.floor((Math.random() * 4)) == 1) && !this.isSame(this.rawData, i, i-4) && this.isDenser(i,this.data,i-4) && this.isDenser(i,this.rawData,i-4))
+								if(!this.isSame(this.rawData, i, i-4) && this.isDenser(i,this.data,i-4) && this.isDenser(i,this.rawData,i-4))
 								{
-									
-									this.switchCells(i, this.rawData, i-4, this.data)
-									
+									if(!this.isBlack(this.rawData, i-4))
+									{
+										if(Math.floor((Math.random() * 4)) == 1)
+										{
+											this.switchCells(i, this.rawData, i-4, this.data)
+										}
+									}
+									else
+									{
+										this.switchCells(i, this.rawData, i-4, this.data)
+									}
 								}
 							}
 						}
 						else if(i < this.data.length-4)
 						{
-							if(this.isBlack(this.data, (i+4)) || this.isFluid(i+4, this.rawData))
+							if(this.isFluidOrVoid(i+4, this.rawData))
 							{
-								if((Math.floor((Math.random() * 4)) == 1) && !this.isSame(this.rawData, i, i+4) && this.isDenser(i,this.data,i+4))
+								if(!this.isSame(this.rawData, i, i+4) && this.isDenser(i,this.data,i+4))
 								{
-									
-									this.switchCells(i, this.rawData, i+4, this.data)
+									if(!this.isBlack(this.rawData, i+4))
+									{
+										if(Math.floor((Math.random() * 4)) == 1)
+										{
+											this.switchCells(i, this.rawData, i+4, this.data)
+										}
+									}
+									else
+									{
+										this.switchCells(i, this.rawData, i+4, this.data)
+									}
 									
 								}
 							}
@@ -295,6 +312,24 @@ app.main = {
 			return false;
 		}
 		else if(this.isBlack(array, index))
+		{
+			return false;
+		}
+		else if(array[index] == 0 && array[index + 1] == 255)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	},
+	
+	//checks if the particle is fluid or void
+	isFluidOrVoid: function(index,array)
+	{
+		//return (!(array[index] == 136)); //use till there are more solids
+		if(array[index] == 136) //hex 88 -> dec 136
 		{
 			return false;
 		}
