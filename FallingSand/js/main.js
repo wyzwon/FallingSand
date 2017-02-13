@@ -34,7 +34,7 @@ app.main = {
 	
     // methods
 	init : function() {
-		console.log("app.main.init() called");
+		//console.log("app.main.init() called");
 		// initialize properties
 		this.canvas = document.querySelector('canvas');
 		this.canvas.width = this.WIDTH;
@@ -122,9 +122,9 @@ app.main = {
 						}
 						
 						//check sides to make sure they exist then try to move left or right randomly
-						if((i > 0) && Math.floor((Math.random() * 2)) == 1)
+						if(Math.floor((Math.random() * 2)) == 1)
 						{
-							if(this.isFluidOrVoid(i-4, this.rawData))
+							if(i && this.isFluidOrVoid(i-4, this.rawData))
 							{
 								//make sure the particle can be swapped
 								if(!this.isSame(this.rawData, i, i-4) && this.isDenser(i,this.data,i-4) && this.isDenser(i,this.rawData,i-4))
@@ -150,9 +150,9 @@ app.main = {
 								}
 							}
 						}
-						else if(i < this.data.length-4)
+						else
 						{
-							if(this.isFluidOrVoid(i+4, this.rawData))
+							if(i < this.data.length-4 && this.isFluidOrVoid(i+4, this.rawData))
 							{
 								//make sure the particle can be swapped
 								if(!this.isSame(this.rawData, i, i+4) && this.isDenser(i,this.data,i+4))
@@ -174,12 +174,75 @@ app.main = {
 									{
 										this.switchCells(i, this.rawData, i+4, this.data)
 									}
-									
 								}
 							}
 						}
 					}
-				}//
+				}
+				if(this.rawData[i+1] == 248)
+				{
+					var iabove = this.above(i);
+					if(this.positionExists(iabove-8))
+					{
+						var treeCount = 0;
+						if(this.isPlant(this.data, iabove-4))
+						{
+							treeCount = treeCount+1;
+						}
+						if(this.isPlant(this.data, iabove))
+						{
+							treeCount = treeCount+1;
+						}
+						if(this.isPlant(this.data, iabove+4))
+						{
+							treeCount = treeCount+1;
+						}
+						if(this.isPlant(this.data, iabove+8))
+						{
+							treeCount = treeCount+1;
+						}
+						if(this.isPlant(this.data, iabove-8))
+						{
+							treeCount = treeCount+1;
+						}
+						if(this.isPlant(this.data, iabove+12))
+						{
+							treeCount = treeCount+1;
+						}
+						if(this.isPlant(this.data, iabove-12))
+						{
+							treeCount = treeCount+1;
+						}
+						
+						
+						if(treeCount < 2)
+						{
+							switch(Math.floor((Math.random() * 3)))
+							{
+								case 0:
+									if(this.isWater(this.data, iabove-4))
+									{
+										this.setPlant(iabove-4);
+									}
+								break;
+								
+								case 1:
+									if(this.isWater(this.data, iabove))
+									{
+										this.setPlant(iabove);
+									}
+								break;
+								
+								case 2:
+									if(this.isWater(this.data, iabove+4))
+									{
+										this.setPlant(iabove+4);
+									}
+								break;
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -257,13 +320,26 @@ app.main = {
 	//check if the position physically exists in the array
 	positionExists: function(indexToCheck)
 	{
-		return( indexToCheck < this.rawData.length);
+		return(indexToCheck < this.rawData.length && indexToCheck);
 	},
 	
 	//checks if black
 	isBlack: function(data, indexLocation)
 	{
-		return((data[indexLocation] == 0) && (data[indexLocation+1] == 0) && (data[indexLocation+2] == 0));
+		return(!data[indexLocation] && !data[indexLocation+1] && !data[indexLocation+2]);
+	},
+	
+	//check if water
+	isWater: function(data, indexLocation)
+	{
+		return((data[indexLocation] == 0) && (data[indexLocation+1] == 0) && (data[indexLocation+2] == 255));
+		
+	},
+	
+	//check if plant
+	isPlant: function(data, indexLocation)
+	{
+		return(data[indexLocation+1] == 248);
 		
 	},
 	
@@ -330,7 +406,7 @@ app.main = {
 		{
 			return false;
 		}
-		else if(array[index] == 0 && array[index + 1] == 255)
+		else if(array[index + 1] == 248) //hex f8 -> dec 248
 		{
 			return false;
 		}
@@ -348,7 +424,7 @@ app.main = {
 		{
 			return false;
 		}
-		else if(array[index] == 0 && array[index + 1] == 255)
+		else if(array[index + 1] == 248)
 		{
 			return false;
 		}
@@ -404,6 +480,12 @@ app.main = {
 	isDenser: function(index1, array, index2) // object1 array object2
 	{
 		return(this.getDensity(array[index1], array[index1+1], array[index1+2]) > this.getDensity(array[index2], array[index2+1], array[index2+2]));
+	},
+	
+	//returns the index above focused cells
+	above: function(index)
+	{
+		return (index - this.WIDTHPIX);
 	},
 	
 	//returns the index below focused cells
@@ -462,6 +544,14 @@ app.main = {
 	{
 		this.data[index] = 0;
 		this.data[index+1] = 0;
+		this.data[index+2] = 0;
+	},
+	
+	//sets the block to plant
+	setPlant: function(index)
+	{
+		this.data[index] = 0;
+		this.data[index+1] = 248;
 		this.data[index+2] = 0;
 	},
 	

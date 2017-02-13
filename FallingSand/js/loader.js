@@ -12,7 +12,7 @@ var app = app || {};
 
 
 window.onload = function(){
-	console.log("window.onload called");
+	//console.log("window.onload called");
 	
 	
 	
@@ -25,12 +25,12 @@ window.onload = function(){
 
 window.onblur = function()
 {
-	console.log("blur at " + Date());
+	//console.log("blur at " + Date());
 	app.main.pauseGame();
 };
 
 window.onfocus = function()
 {
-	console.log("focus at " + Date());
+	//console.log("focus at " + Date());
 	app.main.resumeGame();
 };
