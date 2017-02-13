@@ -140,7 +140,7 @@ app.main = {
 									}
 									else if(this.isFluid(i-4, this.rawData))
 									{
-										if((Math.floor((Math.random() * 4)) == 1) && this.isFluid(i-4, this.data) && !this.isSame(this.rawData, i, i-4) && this.isDenser(i,this.data,i-4))
+										if((Math.floor((Math.random() * 4)) == 1) && this.isFluid(i-4, this.data) && !this.isSame(this.rawData, i, i-4) && this.isDenser(i,this.data,i-4) && this.isDenser(i,this.rawData,i-4))
 										{
 											
 											this.switchCells(i, this.rawData, i-4, this.data)
