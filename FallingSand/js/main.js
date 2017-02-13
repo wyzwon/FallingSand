@@ -114,7 +114,7 @@ app.main = {
 							
 							
 							//attempt to sink
-							else if(this.isFluid(this.below(i), this.rawData) && (this.isDenser(i, this.rawData, this.below(i))) && (Math.floor((Math.random() * 2)) == 1)) //if the particle below is fluid and less dense
+							else if(this.isFluid(this.below(i), this.rawData) && (this.isDenser(i, this.rawData, this.below(i))) && (Math.floor((Math.random() * 2)) == 1)) //if the particle below is fluid and less dense and a 50 percent dice role passed
 							{
 								
 								this.switchCells(i, this.rawData, this.below(i), this.data);
@@ -128,15 +128,24 @@ app.main = {
 								//try to move left or right
 								if(Math.floor((Math.random() * 2)) == 1)
 								{
-									if(this.isBlack(this.rawData, i-4))//(this.rawData[i-4] == 0) && (this.rawData[i-3] == 0) && (this.rawData[i-2] == 0))
+									if(this.isBlack(this.rawData, i-4))
 									{
-										if(this.isBlack(this.data, (i-4)))//(this.data[i-4] == 0) && (this.data[i-3] == 0) && (this.data[i-2] == 0))
+										if(this.isBlack(this.data, (i-4)))
 										{
 											
 											this.moveParticle(i, this.rawData, (i-4), this.data);
 											
 										}
 										
+									}
+									else if(this.isFluid(i-4, this.rawData))
+									{
+										if((Math.floor((Math.random() * 4)) == 1) && this.isFluid(i-4, this.data) && !this.isSame(this.rawData, i, i-4) && this.isDenser(i,this.data,i-4))
+										{
+											
+											this.switchCells(i, this.rawData, i-4, this.data)
+											
+										}
 									}
 								}
 								else
@@ -147,6 +156,15 @@ app.main = {
 										{
 											
 											this.moveParticle(i, this.rawData, (i+4), this.data);
+											
+										}
+									}
+									else if(this.isFluid(i+4, this.rawData))
+									{
+										if((Math.floor((Math.random() * 4)) == 1) && this.isFluid(i+4, this.data) && !this.isSame(this.rawData, i, i+4) && this.isDenser(i,this.data,i+4))
+										{
+											
+											this.switchCells(i, this.rawData, i+4, this.data)
 											
 										}
 									}
@@ -201,31 +219,20 @@ app.main = {
 		var mouse = getMouse(e);
 		
 		this.ctx.fillStyle = this.sandColor;
-
-
-		
-		
-
-
 	},
 	
 	
 	doMousemove: function(e)
 	{
-	
 		//bail out if the mouse button is not down
  		if(! this.dragging) return;
 		
 		//get location of mouse in canvas coordinates
 		var mouse = getMouse(e);
 		
-
 		this.ctx.fillStyle = this.sandColor;
-
 		this.ctx.fillRect(mouse.x - (this.penSize / 2), mouse.y - (this.penSize / 2), this.penSize, this.penSize);
-		
 		this.ctx.stroke();
-
 	},
 	
 	
@@ -290,11 +297,9 @@ app.main = {
 		}.bind(this);
 	},
 	
-	//swap two given cells
+	//swap two given cells (cell_1, rawData, cell_2, data)
 	switchCells: function(index1, array1, index2, array2 )
 	{
-		
-		
 		array2[index1] = array1[index2];
 		array2[index1+1] = array1[index2+1];
 		array2[index1+2] = array1[index2+2];
@@ -309,16 +314,19 @@ app.main = {
 	
 	isFluid: function(index,array)
 	{
-		return (!(array[index] == 136)); //use till there are more solids
-		/*var foo = array[index];
+		//return (!(array[index] == 136)); //use till there are more solids
 		if(array[index] == 136) //hex 88 -> dec 136
+		{
+			return false;
+		}
+		else if(this.isBlack(array, index))
 		{
 			return false;
 		}
 		else
 		{
 			return true;
-		}*/
+		}
 	},
 	
 	getDensity: function(rValue, gValue, bValue)
@@ -349,7 +357,17 @@ app.main = {
 		{
 			return 0;//unknown but hey let it float
 		}
-		
+	},
+	
+	//tell if objects are the same
+	isSame: function(array, index1, index2)
+	{
+		return (array[index1] == array[index2] && array[index1+1] == array[index2+1] && array[index1+2] == array[index2+2]);
+	},
+	
+	isSameMulti: function(array, array2, index1, index2)
+	{
+		return (array[index1] == array2[index2] && array[index1+1] == array2[index2+1] && array[index1+2] == array2[index2+2]);
 	},
 	
 	//declare if object one is denser then object two
@@ -407,7 +425,6 @@ app.main = {
 		{
 			return false; //particle does not react with anything
 		}
-		
 	},
 	
 	//clears space
@@ -421,20 +438,14 @@ app.main = {
 	pauseGame: function()
 	{
 		this.paused = true;
-		
-		
 		cancelAnimationFrame(this.animationID);
-		
-		
 		this.update();
 	},
 	
 	resumeGame: function()
 	{
 		cancelAnimationFrame(this.animationID);
-		
 		this.paused = false;
-		
 		this.update();
 	},
 	
@@ -446,7 +457,6 @@ app.main = {
 		ctx.textAlign = "center";
 		ctx.textBaseline = "middle";
 		//ctx.fillText(this.ctx, "... PAUSED ...", this.WIDTH/2, this.HEIGHT/2, "40pt courier", "white");
-		
 		//ctx.fillText(this.ctx, "By Thomas Bouffard", this.WIDTH/2, (3 * this.HEIGHT/4), "30pt courier", "white");
 		ctx.restore();
 	},
@@ -462,7 +472,7 @@ app.main = {
 }; // end app.main
 
 
-//density layers (higher is lighter)
+//density layers (higher (position) is lighter)
 
 
 //water 1
