@@ -94,7 +94,7 @@ app.main = {
 					//if the focused particle is fluid
 					if(this.isFluid(i,this.rawData))
 					{
-						//position below exists
+						//check if position below exists
 						if(this.positionExists(this.below(i), this.rawData))
 						{
 							//check if space below is empty
@@ -119,35 +119,30 @@ app.main = {
 								this.switchCells(i, this.rawData, this.below(i), this.data);
 								
 							}
-							
-							//check sides
-							else
+						}
+						
+						//check sides to make sure they exist then try to move left or right randomly
+						if((i > 0) && Math.floor((Math.random() * 2)) == 1)
+						{
+							if(this.isBlack(this.rawData, i-4) || this.isFluid(i-4, this.rawData))
 							{
-		
-								//try to move left or right
-								if(Math.floor((Math.random() * 2)) == 1)
+								if((Math.floor((Math.random() * 4)) == 1) && !this.isSame(this.rawData, i, i-4) && this.isDenser(i,this.data,i-4) && this.isDenser(i,this.rawData,i-4))
 								{
-									if(this.isBlack(this.rawData, i-4) || this.isFluid(i-4, this.rawData))
-									{
-										if((Math.floor((Math.random() * 4)) == 1) && !this.isSame(this.rawData, i, i-4) && this.isDenser(i,this.data,i-4) && this.isDenser(i,this.rawData,i-4))
-										{
-											
-											this.switchCells(i, this.rawData, i-4, this.data)
-											
-										}
-									}
+									
+									this.switchCells(i, this.rawData, i-4, this.data)
+									
 								}
-								else
+							}
+						}
+						else if(i < this.data.length-4)
+						{
+							if(this.isBlack(this.data, (i+4)) || this.isFluid(i+4, this.rawData))
+							{
+								if((Math.floor((Math.random() * 4)) == 1) && !this.isSame(this.rawData, i, i+4) && this.isDenser(i,this.data,i+4))
 								{
-									if(this.isBlack(this.data, (i+4)) || this.isFluid(i+4, this.rawData))
-									{
-										if((Math.floor((Math.random() * 4)) == 1) && !this.isSame(this.rawData, i, i+4) && this.isDenser(i,this.data,i+4))
-										{
-											
-											this.switchCells(i, this.rawData, i+4, this.data)
-											
-										}
-									}
+									
+									this.switchCells(i, this.rawData, i+4, this.data)
+									
 								}
 							}
 						}
