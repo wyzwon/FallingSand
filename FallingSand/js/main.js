@@ -74,14 +74,14 @@ app.main = {
 			for(var i = 0; i < this.data.length; i += 4)
 			{
 				//if position has a color
-				if((this.rawData[i] != 0) || (this.rawData[i+1] != 0) || (this.rawData[i+2] != 0))
+				if(!this.isBlack(this.rawData, i))//(this.rawData[i] != 0) || (this.rawData[i+1] != 0) || (this.rawData[i+2] != 0))
 				{
 					//this will be replaced with a call to in boundry check
 					//position bellow exists
 					if((this.rawData.length + this.WIDTHPIX) < ((this.WIDTH * 4) * (this.HEIGHT * 4)))
 					{
-						//if black
-						if((this.rawData[i+this.WIDTHPIX] == 0) && (this.rawData[i+1+this.WIDTHPIX] == 0) && (this.rawData[i+2+this.WIDTHPIX] == 0))
+						//check if there is an object below
+						if(this.isBlack(this.rawData, (i + this.WIDTHPIX)))//(this.rawData[i+this.WIDTHPIX] == 0) && (this.rawData[i+1+this.WIDTHPIX] == 0) && (this.rawData[i+2+this.WIDTHPIX] == 0))
 						{
 							this.data[i+this.WIDTHPIX] = this.rawData[i];
 							this.data[i+this.WIDTHPIX+1] = this.rawData[i+1];
@@ -200,10 +200,32 @@ app.main = {
 	
 	
 	
-	positionExists: function(fromright, indexToCheck)
+	positionExists: function(fromRight, indexToCheck)
 	{
-		//if(indexToCheck > (WIDTH * HEIGHT))
-	}
+		if(indexToCheck != undefined)
+		{
+			//if this block works it will be a miracle
+			if(((fromRight == true) && ((indexToCheck % WIDTH) == (WIDTH - 1))) || (((fromRight == false) && ((indexToCheck % WIDTH) == (0)))))
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	},
+	
+	//checks if black
+	isBlack: function(data, indexLocation)
+	{
+		return((data[indexLocation] == 0) && (data[indexLocation+1] == 0) && (data[indexLocation+2] == 0));
+		
+	},
 	
 	
 	
