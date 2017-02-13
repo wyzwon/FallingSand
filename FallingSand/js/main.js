@@ -134,17 +134,17 @@ app.main = {
 									{
 										if(Math.floor((Math.random() * 4)) == 1)
 										{
-											this.switchCells(i, this.rawData, i-4, this.data)
+											this.switchCells(i, this.rawData, i-4, this.data);
 										}
 									}
 									//if the particle can spread twice as fast, do so
-									else if((i > 0) && this.isBlack(this.data, i-8))
+									else if((i-8 > 0) && this.isBlack(this.data, i-8))
 									{
-										this.switchCells(i, this.rawData, i-8, this.data)
+										this.switchCells(i, this.rawData, i-8, this.data);
 									}
 									else
 									{
-										this.switchCells(i, this.rawData, i-4, this.data)
+										this.switchCells(i, this.rawData, i-4, this.data);
 									}
 									
 								}
@@ -162,17 +162,17 @@ app.main = {
 									{
 										if(Math.floor((Math.random() * 4)) == 1)
 										{
-											this.switchCells(i, this.rawData, i+4, this.data)
+											this.switchCells(i, this.rawData, i+4, this.data);
 										}
 									}
 									//if the particle can spread twice as fast, do so
 									else if((i < this.data.length-8) && this.isBlack(this.data, i+8))
 									{
-										this.switchCells(i, this.rawData, i+8, this.data)
+										this.switchCells(i, this.rawData, i+8, this.data);
 									}
 									else
 									{
-										this.switchCells(i, this.rawData, i+4, this.data)
+										this.switchCells(i, this.rawData, i+4, this.data);
 									}
 								}
 							}
@@ -184,40 +184,22 @@ app.main = {
 					var iabove = this.above(i);
 					if(this.positionExists(iabove-8))
 					{
+						//count how many plant blocks are above this one within 7 squares
 						var treeCount = 0;
-						if(this.isPlant(this.data, iabove-4))
-						{
-							treeCount = treeCount+1;
-						}
-						if(this.isPlant(this.data, iabove))
-						{
-							treeCount = treeCount+1;
-						}
-						if(this.isPlant(this.data, iabove+4))
-						{
-							treeCount = treeCount+1;
-						}
-						if(this.isPlant(this.data, iabove+8))
-						{
-							treeCount = treeCount+1;
-						}
-						if(this.isPlant(this.data, iabove-8))
-						{
-							treeCount = treeCount+1;
-						}
-						if(this.isPlant(this.data, iabove+12))
-						{
-							treeCount = treeCount+1;
-						}
-						if(this.isPlant(this.data, iabove-12))
-						{
-							treeCount = treeCount+1;
-						}
+						if(this.isPlant(this.data, iabove-4)){treeCount++;}
+						if(this.isPlant(this.data, iabove)){treeCount++;}
+						if(this.isPlant(this.data, iabove+4)){treeCount++;}
+						if(this.isPlant(this.data, iabove+8)){treeCount++;}
+						if(this.isPlant(this.data, iabove-8)){treeCount++;}
+						if(this.isPlant(this.data, iabove+12)){treeCount++;}
+						if(this.isPlant(this.data, iabove-12)){treeCount++;}
+						if(this.isPlant(this.data, iabove+16)){treeCount++;}
+						if(this.isPlant(this.data, iabove-16)){treeCount++;}
 						
-						
+						//grow if its open enough
 						if(treeCount < 2)
 						{
-							switch(Math.floor((Math.random() * 3)))
+							switch(Math.floor((Math.random() * 5)))
 							{
 								case 0:
 									if(this.isWater(this.data, iabove-4))
@@ -239,8 +221,26 @@ app.main = {
 										this.setPlant(iabove+4);
 									}
 								break;
+								
+								case 3:
+									if(this.isWater(this.data, iabove+8))
+									{
+										this.setPlant(iabove+8);
+									}
+								break;
+								
+								case 4:
+									if(this.isWater(this.data, iabove-8))
+									{
+										this.setPlant(iabove-8);
+									}
+								break;
 							}
 						}
+						/*else if(this.isWater(this.data, iabove) && Math.floor((Math.random() * 4)) == 1)
+						{
+							this.setBlack(iabove);
+						}*/
 					}
 				}
 			}
@@ -378,6 +378,11 @@ app.main = {
 		document.querySelector("#clearButton").onclick = function(e){
 			this.clearScene();
 		}.bind(this);
+		
+		/*document.querySelector("#backgroundRunSwitch").onchange = function(e){
+			document.getElementById("backgroundRunSwitch").checked = false;
+			this.clearScene();
+		}.bind(this);*/
 	},
 	
 	//swap two given cells (cell_1, rawData, cell_2, data)

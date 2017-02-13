@@ -26,7 +26,10 @@ window.onload = function(){
 window.onblur = function()
 {
 	//console.log("blur at " + Date());
-	app.main.pauseGame();
+	if(!document.getElementById("backgroundRunSwitch").checked)
+	{
+		app.main.pauseGame();
+	}
 };
 
 window.onfocus = function()
