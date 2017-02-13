@@ -3,7 +3,11 @@
 
 <head>
 	<meta charset="utf-8" />
+	<link href='https://fonts.googleapis.com/css?family=Questrial' rel='stylesheet' type='text/css'>
 	<style>
+	body{
+	font-family: 'Questrial', helvetica, sans serif;
+	}
 		canvas{border:1px solid gray;
 		image-rendering: pixelated;
 		}
@@ -30,6 +34,8 @@
 				<option value="#000000">Eraser</option>
 			</select>
 		</label>
+		<label for="PenSize">Pen size (2-50)</label>
+		<input id="PenSize" type="range" min="2" max="50" step="2"/>
 	</div>
 	
 	<script src='js/utilities.js'></script>

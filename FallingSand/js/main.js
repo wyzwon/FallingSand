@@ -23,6 +23,7 @@ app.main = {
     canvas: undefined,
     ctx: undefined,
 	dragging: undefined,
+	penSize: undefined,
    	lastTime: 0, // used by calculateDeltaTime() 
 	
 	imageData: undefined,
@@ -41,6 +42,7 @@ app.main = {
 		this.canvas.height = this.HEIGHT;
 		this.ctx = this.canvas.getContext('2d');
 		this.dragging = false;
+		this.penSize = 30;
 		
 		this.WIDTHPIX = this.WIDTH * 4,
 		this.HEIGHTPIX = this.HEIGHT * 4,
@@ -64,89 +66,83 @@ app.main = {
 	
 	
 	update: function(){
-		// 1) LOOP
-		// schedule a call to update()
+
 	 	this.animationID = requestAnimationFrame(this.update.bind(this));
 	 	
 
 	 	
-	 	// 3) HOW MUCH TIME HAS GONE BY?
 	 	var dt = this.calculateDeltaTime();
 	 	 
 
 		
 		this.imageData = this.ctx.getImageData(0,0,this.canvas.width,this.canvas.height);
-		this.data = this.imageData.data;
-		this.rawData = this.data.slice(0);
+		this.data = this.imageData.data; //data to manipulate
+		this.rawData = this.data.slice(0); //unmodified data to reference
 		
-		//slow down the cycle
-		//if(this.animationID % 1) == 0)
-		//{
-			for(var i = 0; i < this.data.length; i += 4)
+		//iterate through every cell in the canvas
+		for(var i = 0; i < this.data.length; i += 4)
+		{
+			//if position has a color
+			if(!this.isBlack(this.rawData, i))
 			{
-				//if position has a color
-				if(!this.isBlack(this.rawData, i))
+				//if the particle is the same in both arrays (aka: has not been modified)
+				if((this.rawData[i] == this.data[i]) && (this.rawData[i+1] == this.data[i+1]) && (this.rawData[i+2] == this.data[i+2]))
 				{
-					//if the particle is the same in both arrays (aka: has not been modified)
-					if((this.rawData[i] == this.data[i]) && (this.rawData[i+1] == this.data[i+1]) && (this.rawData[i+2] == this.data[i+2]))
+					//if the focused particle is fluid
+					if(this.isFluid(i,this.rawData))
 					{
-						//if the focused particle is fluid
-						if(this.isFluid(i,this.rawData))
+						//position below exists
+						if(this.positionExists(this.below(i), this.rawData))
 						{
-							//position below exists
-							if(this.positionExists(this.below(i), this.rawData))
+							//check if space below is empty
+							if(this.isBlack(this.rawData, this.below(i)))
 							{
-								//check if space below is empty
-								if(this.isBlack(this.rawData, this.below(i)))
-								{
-									
-									this.moveParticle(i, this.rawData, this.below(i), this.data);
-									
-								}
 								
-								//attempt to merge
-								else if(this.tryMerge(i,this.below(i)))
-								{
-									//there was no reason not to put the merge code in the logic used to check if it was even possible
-								}
+								this.moveParticle(i, this.rawData, this.below(i), this.data);
 								
+							}
+							
+							//attempt to merge
+							else if(this.tryMerge(i,this.below(i)))
+							{
+								//there was no reason not to put the merge code in the logic used to check if it was even possible
+							}
+							
+							
+							//attempt to sink
+							else if(this.isFluid(this.below(i), this.rawData) && (this.isDenser(i, this.rawData, this.below(i))) && (Math.floor((Math.random() * 2)) == 1)) //if the particle below is fluid and less dense
+							{
 								
-								//attempt to sink
-								else if(this.isFluid(this.below(i), this.rawData) && (this.isDenser(i, this.rawData, this.below(i))) && (Math.floor((Math.random() * 2)) == 1)) //if the particle below is fluid and less dense
-								{
-									
-									this.switchCells(i, this.rawData, this.below(i), this.data);
-									
-								}
+								this.switchCells(i, this.rawData, this.below(i), this.data);
 								
-								//check sides
-								else
-								{
+							}
+							
+							//check sides
+							else
+							{
 		
-									//try to move left or right
-									if(Math.floor((Math.random() * 2)) == 1)
+								//try to move left or right
+								if(Math.floor((Math.random() * 2)) == 1)
+								{
+									if(this.isBlack(this.rawData, i-4))//(this.rawData[i-4] == 0) && (this.rawData[i-3] == 0) && (this.rawData[i-2] == 0))
 									{
-										if(this.isBlack(this.rawData, i-4))//(this.rawData[i-4] == 0) && (this.rawData[i-3] == 0) && (this.rawData[i-2] == 0))
+										if(this.isBlack(this.data, (i-4)))//(this.data[i-4] == 0) && (this.data[i-3] == 0) && (this.data[i-2] == 0))
 										{
-											if(this.isBlack(this.data, (i-4)))//(this.data[i-4] == 0) && (this.data[i-3] == 0) && (this.data[i-2] == 0))
-											{
-												
-												this.moveParticle(i, this.rawData, (i-4), this.data);
-												
-											}
+											
+											this.moveParticle(i, this.rawData, (i-4), this.data);
 											
 										}
+										
 									}
-									else
+								}
+								else
+								{
+									if(this.isBlack(this.rawData, i+4))//(this.rawData[i+4] == 0) && (this.rawData[i+5] == 0) && (this.rawData[i+6] == 0))
 									{
-										if(this.isBlack(this.rawData, i+4))//(this.rawData[i+4] == 0) && (this.rawData[i+5] == 0) && (this.rawData[i+6] == 0))
+										if(this.isBlack(this.data, (i+4)))//t(this.data[i+4] == 0) && (this.data[i+5] == 0) && (this.data[i+6] == 0))
 										{
-											if(this.isBlack(this.data, (i+4)))//t(this.data[i+4] == 0) && (this.data[i+5] == 0) && (this.data[i+6] == 0))
-											{
-												
-												this.moveParticle(i, this.rawData, (i+4), this.data);
-												
-											}
+											
+											this.moveParticle(i, this.rawData, (i+4), this.data);
 											
 										}
 									}
@@ -156,8 +152,8 @@ app.main = {
 					}
 				}
 			}
-			//console.log("updated");
-		//}
+		}
+
 		
 		//apply changes
 		this.ctx.putImageData(this.imageData, 0, 0);
@@ -176,7 +172,6 @@ app.main = {
 
 	
 	calculateDeltaTime: function(){
-		// what's with (+ new Date) below?
 		// + calls Date.valueOf(), which converts it from an object to a 	
 		// primitive (number of milliseconds since January 1, 1970 local time)
 		var now,fps;
@@ -202,18 +197,9 @@ app.main = {
 		
 		var mouse = getMouse(e);
 		
-		this.ctx.fillStyle = this.sandColor;//"#EBEFA0";
-		//console.log("sandColor whilesetting fillStyle: " + this.sandColor);
+		this.ctx.fillStyle = this.sandColor;
 
-		//this.ctx.fillRect(mouse.x,mouse.y,1,1);
-		
-		
-		
-		
-		//this.ctx.fillRect(mouse.x - 15, mouse.y - 15, 30, 30);
-		
-		//this.ctx.beginPath();
-		//this.ctx.moveTo(mouse.x, mouse.y);
+
 		
 		
 		//this.ctx.beginPath();
@@ -237,7 +223,7 @@ app.main = {
 		//this.ctx.lineWidth = lineWidth;
 		
 		//this.ctx.lineTo(mouse.x + 0.5,mouse.y + 0.5);
-		this.ctx.fillRect(mouse.x - 15, mouse.y - 15, 30, 30);
+		this.ctx.fillRect(mouse.x - (this.penSize / 2), mouse.y - (this.penSize / 2), this.penSize, this.penSize);
 		
 		this.ctx.stroke();
 
@@ -259,8 +245,6 @@ app.main = {
 	positionExists: function(indexToCheck)
 	{
 		return( indexToCheck < this.rawData.length);
-		
-		//return (this.rawData[indexToCheck] != undefined);
 		
 		//code snippet saved to block wrap around if I feel it should be done
 		
@@ -317,17 +301,16 @@ app.main = {
 				this.sandColor = e.target.value;
 				//console.log("sandColor after change: " + this.sandColor);
 			}.bind(this);
+			
+		document.querySelector("#PenSize").onchange = function(e){
+				this.penSize = e.target.value;
+			}.bind(this);
 	},
 	
 	//swap two given cells
 	switchCells: function(index1, array1, index2, array2 )
 	{
-		// temp = new array["array1[" + index1 + "]","array1[" + (index1+1) + "]","array1[" + (index1+2) + "]","array1[" + (index1+3) + "]"];
 		
-		//var temp1 = array1[index1];
-		//var temp2 = array1[index1 + 1];
-		//var temp3 = array1[index1 + 2];
-		//var temp4 = array1[index1 + 3];
 		
 		array2[index1] = array1[index2];
 		array2[index1+1] = array1[index2+1];
