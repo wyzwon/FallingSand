@@ -87,7 +87,7 @@ app.main = {
 				//if position has a color
 				if(!this.isBlack(this.rawData, i))
 				{
-					//if the particle is thesame in 
+					//if the particle is the same in both arrays (aka: has not been modified)
 					if((this.rawData[i] == this.data[i]) && (this.rawData[i+1] == this.data[i+1]) && (this.rawData[i+2] == this.data[i+2]))
 					{
 						//if the focused particle is fluid
@@ -105,7 +105,10 @@ app.main = {
 								}
 								
 								//attempt to merge
-								//if(
+								else if(this.tryMerge(i,this.below(i)))
+								{
+									//there was no reason not to put the merge code in the logic used to check if it was even possible
+								}
 								
 								
 								//attempt to sink
@@ -355,7 +358,7 @@ app.main = {
 	
 	getDensity: function(rValue, gValue, bValue)
 	{
-		if(rValue > 0)
+		if((rValue > 0) && (rValue < 255))
 		{
 			if(rValue == 235)//sand //hex EB == dec 235
 			{
@@ -391,9 +394,63 @@ app.main = {
 	},
 	
 	//returns the index below focused cells
-	below: function(i)
+	below: function(index)
 	{
-		return (i + this.WIDTHPIX);
+		return (index + this.WIDTHPIX);
+	},
+	
+	tryMerge: function(index,lowerIndex)
+	{
+		
+		//determine the first object and compare the second to its list of reactants then reacts if able
+		if((this.rawData[index] == 255) && (this.rawData[index+1] == 255) && (this.rawData[index + 2] == 255)) //is salt
+		{
+			
+			if((this.rawData[lowerIndex] == 0) && (this.rawData[lowerIndex+1] == 0) && (this.rawData[lowerIndex + 2] == 255)) //is water
+			{
+				//set upper to black
+				this.setBlack(index);
+				
+				//set lower to merge result (saltwater)
+				this.data[lowerIndex] = 170;
+				this.data[lowerIndex+1] = 204;
+				this.data[lowerIndex+2] = 255;
+			}
+			else
+			{
+				return false; //does not react with the first particle
+			}
+		}
+		else if((this.rawData[index] == 0) && (this.rawData[index+1] == 0) && (this.rawData[index + 2] == 255)) //is water
+		{
+			if((this.rawData[lowerIndex] == 255) && (this.rawData[lowerIndex+1] == 255) && (this.rawData[lowerIndex + 2] == 255)) //is salt
+			{
+				//set upper to black
+				this.setBlack(index);
+				
+				//set lower to merge result (saltwater)
+				this.data[lowerIndex] = 170;
+				this.data[lowerIndex+1] = 204;
+				this.data[lowerIndex+2] = 255;
+			}
+			else
+			{
+				return false; //does not react with the first particle
+			}
+		}
+		else
+		{
+			return false; //particle does not react with anything
+		}
+		
+	},
+	
+	//clears space
+	setBlack: function(index)
+	{
+		this.data[index] = 0;
+		this.data[index+1] = 0;
+		this.data[index+2] = 0;
 	}
 	
 }; // end app.main
