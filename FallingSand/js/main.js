@@ -126,19 +126,27 @@ app.main = {
 						{
 							if(this.isFluidOrVoid(i-4, this.rawData))
 							{
+								//make sure the particle can be swapped
 								if(!this.isSame(this.rawData, i, i-4) && this.isDenser(i,this.data,i-4) && this.isDenser(i,this.rawData,i-4))
 								{
-									if(!this.isBlack(this.rawData, i-4))
+									//if the particle is moving through fluid, make it do so slower
+									if(!this.isBlack(this.data, i-4))
 									{
 										if(Math.floor((Math.random() * 4)) == 1)
 										{
 											this.switchCells(i, this.rawData, i-4, this.data)
 										}
 									}
+									//if the particle can spread twice as fast, do so
+									else if((i > 0) && this.isBlack(this.data, i-8))
+									{
+										this.switchCells(i, this.rawData, i-8, this.data)
+									}
 									else
 									{
 										this.switchCells(i, this.rawData, i-4, this.data)
 									}
+									
 								}
 							}
 						}
@@ -146,14 +154,21 @@ app.main = {
 						{
 							if(this.isFluidOrVoid(i+4, this.rawData))
 							{
+								//make sure the particle can be swapped
 								if(!this.isSame(this.rawData, i, i+4) && this.isDenser(i,this.data,i+4))
 								{
+									//if the particle is moving through fluid, make it do so slower
 									if(!this.isBlack(this.rawData, i+4))
 									{
 										if(Math.floor((Math.random() * 4)) == 1)
 										{
 											this.switchCells(i, this.rawData, i+4, this.data)
 										}
+									}
+									//if the particle can spread twice as fast, do so
+									else if((i < this.data.length-8) && this.isBlack(this.data, i+8))
+									{
+										this.switchCells(i, this.rawData, i+8, this.data)
 									}
 									else
 									{
