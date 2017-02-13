@@ -81,52 +81,54 @@ app.main = {
 			{
 				//if position has a color
 				if(!this.isBlack(this.rawData, i))
-				{
-					//position bellow exists
-					if(this.positionExists(i + this.WIDTHPIX))
+				{0
+					if(this.isFluid(i,this.rawData))
 					{
-						//check if there is an object below
-						if(this.isBlack(this.rawData, (i + this.WIDTHPIX)))
+						//position bellow exists
+						if(this.positionExists(i + this.WIDTHPIX))
 						{
-							
-							this.moveParticle(i, this.rawData, (i+this.WIDTHPIX), this.data);
-							
-						}
-						
-						//check sides
-						else
-						{
-
-							//try to move left or right
-							if(Math.floor((Math.random() * 2)) == 1)
+							//check if there is an object below
+							if(this.isBlack(this.rawData, (i + this.WIDTHPIX)))
 							{
-								if(this.isBlack(this.rawData, i-4))//(this.rawData[i-4] == 0) && (this.rawData[i-3] == 0) && (this.rawData[i-2] == 0))
-								{
-									if(this.isBlack(this.data, (i-4)))//(this.data[i-4] == 0) && (this.data[i-3] == 0) && (this.data[i-2] == 0))
-									{
-										
-										this.moveParticle(i, this.rawData, (i-4), this.data);
-										
-									}
-									
-								}
+								
+								this.moveParticle(i, this.rawData, (i+this.WIDTHPIX), this.data);
+								
 							}
+							
+							//check sides
 							else
 							{
-								if(this.isBlack(this.rawData, i+4))//(this.rawData[i+4] == 0) && (this.rawData[i+5] == 0) && (this.rawData[i+6] == 0))
+	
+								//try to move left or right
+								if(Math.floor((Math.random() * 2)) == 1)
 								{
-									if(this.isBlack(this.data, (i+4)))//t(this.data[i+4] == 0) && (this.data[i+5] == 0) && (this.data[i+6] == 0))
+									if(this.isBlack(this.rawData, i-4))//(this.rawData[i-4] == 0) && (this.rawData[i-3] == 0) && (this.rawData[i-2] == 0))
 									{
-										
-										this.moveParticle(i, this.rawData, (i+4), this.data);
+										if(this.isBlack(this.data, (i-4)))//(this.data[i-4] == 0) && (this.data[i-3] == 0) && (this.data[i-2] == 0))
+										{
+											
+											this.moveParticle(i, this.rawData, (i-4), this.data);
+											
+										}
 										
 									}
-									
+								}
+								else
+								{
+									if(this.isBlack(this.rawData, i+4))//(this.rawData[i+4] == 0) && (this.rawData[i+5] == 0) && (this.rawData[i+6] == 0))
+									{
+										if(this.isBlack(this.data, (i+4)))//t(this.data[i+4] == 0) && (this.data[i+5] == 0) && (this.data[i+6] == 0))
+										{
+											
+											this.moveParticle(i, this.rawData, (i+4), this.data);
+											
+										}
+										
+									}
 								}
 							}
 						}
 					}
-					
 					
 					
 				}
@@ -240,13 +242,34 @@ app.main = {
 		this.sandColor = color;
 	},
 	
+	//setup Ui triggers
 	setupUI: function()
 	{
 		document.querySelector("#sandType").onchange = function(e){
-				//this.sandColor = e.target.value;
-				this.setSandColor(e.target.value);
+
+				this.sandColor = e.target.value;
 				console.log("sandColor after change: " + this.sandColor);
-			};
+			}.bind(this);
+	},
+	
+	//swap two given cells
+	switchCells: function(index1, array1, index2, array2 )
+	{
+		
+	},
+	
+	
+	isFluid: function(index,array)
+	{
+		var foo = array[index];
+		if(array[index] == 136) //hex 88 -> dec 136
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	},
 	
 }; // end app.main
