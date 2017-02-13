@@ -89,7 +89,7 @@ app.main = {
 			if(!this.isBlack(this.rawData, i))
 			{
 				//if the particle is the same in both arrays (aka: has not been modified)
-				if((this.rawData[i] == this.data[i]) && (this.rawData[i+1] == this.data[i+1]) && (this.rawData[i+2] == this.data[i+2]))
+				if(this.isSameMulti(this.rawData, this.data, i, i))
 				{
 					//if the focused particle is fluid
 					if(this.isFluid(i,this.rawData))
@@ -127,19 +127,9 @@ app.main = {
 								//try to move left or right
 								if(Math.floor((Math.random() * 2)) == 1)
 								{
-									if(this.isBlack(this.rawData, i-4))
+									if(this.isBlack(this.rawData, i-4) || this.isFluid(i-4, this.rawData))
 									{
-										if(this.isBlack(this.data, (i-4)))
-										{
-											
-											this.moveParticle(i, this.rawData, (i-4), this.data);
-											
-										}
-										
-									}
-									else if(this.isFluid(i-4, this.rawData))
-									{
-										if((Math.floor((Math.random() * 4)) == 1) && this.isFluid(i-4, this.data) && !this.isSame(this.rawData, i, i-4) && this.isDenser(i,this.data,i-4) && this.isDenser(i,this.rawData,i-4))
+										if((Math.floor((Math.random() * 4)) == 1) && !this.isSame(this.rawData, i, i-4) && this.isDenser(i,this.data,i-4) && this.isDenser(i,this.rawData,i-4))
 										{
 											
 											this.switchCells(i, this.rawData, i-4, this.data)
@@ -149,18 +139,9 @@ app.main = {
 								}
 								else
 								{
-									if(this.isBlack(this.rawData, i+4))//(this.rawData[i+4] == 0) && (this.rawData[i+5] == 0) && (this.rawData[i+6] == 0))
+									if(this.isBlack(this.data, (i+4)) || this.isFluid(i+4, this.rawData))
 									{
-										if(this.isBlack(this.data, (i+4)))//t(this.data[i+4] == 0) && (this.data[i+5] == 0) && (this.data[i+6] == 0))
-										{
-											
-											this.moveParticle(i, this.rawData, (i+4), this.data);
-											
-										}
-									}
-									else if(this.isFluid(i+4, this.rawData))
-									{
-										if((Math.floor((Math.random() * 4)) == 1) && this.isFluid(i+4, this.data) && !this.isSame(this.rawData, i, i+4) && this.isDenser(i,this.data,i+4))
+										if((Math.floor((Math.random() * 4)) == 1) && !this.isSame(this.rawData, i, i+4) && this.isDenser(i,this.data,i+4))
 										{
 											
 											this.switchCells(i, this.rawData, i+4, this.data)
@@ -171,7 +152,7 @@ app.main = {
 							}
 						}
 					}
-				}
+				}//
 			}
 		}
 
@@ -368,6 +349,7 @@ app.main = {
 		return (array[index1] == array[index2] && array[index1+1] == array[index2+1] && array[index1+2] == array[index2+2]);
 	},
 	
+	//tell if objects in different arrays are the same
 	isSameMulti: function(array, array2, index1, index2)
 	{
 		return (array[index1] == array2[index2] && array[index1+1] == array2[index2+1] && array[index1+2] == array2[index2+2]);
