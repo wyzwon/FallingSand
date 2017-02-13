@@ -78,8 +78,8 @@ app.main = {
 				{
 					//this will be replaced with a call to in boundry check
 					//position bellow exists
-					//if((this.rawData + this.WIDTHPIX) < (this.WIDTH * this.HEIGHT * 4))
-					//{
+					if((this.rawData.length + this.WIDTHPIX) < ((this.WIDTH * 4) * (this.HEIGHT * 4)))
+					{
 						//if black
 						if((this.rawData[i+this.WIDTHPIX] == 0) && (this.rawData[i+1+this.WIDTHPIX] == 0) && (this.rawData[i+2+this.WIDTHPIX] == 0))
 						{
@@ -91,14 +91,51 @@ app.main = {
 							this.data[i+1] = 0;
 							this.data[i+2] = 0;
 						}
-					//}
-					//this.data[i+this.WIDTHPIX] = this.rawData[i];
-					//this.data[i+this.WIDTHPIX+1] = this.rawData[i+1];
-					//this.data[i+this.WIDTHPIX+2] = this.rawData[i+2];
+						
+						//check sides
+						else
+						{
+
+							//try to move left or right
+							if(Math.floor((Math.random() * 2)) == 1)
+							{
+								if((this.rawData[i-4] == 0) && (this.rawData[i-3] == 0) && (this.rawData[i-2] == 0))
+								{
+									if((this.data[i-4] == 0) && (this.data[i-3] == 0) && (this.data[i-2] == 0))
+									{
+										this.data[i-4] = this.rawData[i];
+										this.data[i-3] = this.rawData[i+1];
+										this.data[i-2] = this.rawData[i+2];
+										
+										this.data[i] = 0;
+										this.data[i+1] = 0;
+										this.data[i+2] = 0;
+									}
+									
+								}
+							}
+							else
+							{
+								if((this.rawData[i+4] == 0) && (this.rawData[i+5] == 0) && (this.rawData[i+6] == 0))
+								{
+									if((this.data[i+4] == 0) && (this.data[i+5] == 0) && (this.data[i+6] == 0))
+									{
+										this.data[i+4] = this.rawData[i];
+										this.data[i+5] = this.rawData[i+1];
+										this.data[i+6] = this.rawData[i+2];
+										
+										this.data[i] = 0;
+										this.data[i+1] = 0;
+										this.data[i+2] = 0;
+									}
+									
+								}
+							}
+						}
+					}
 					
-					//this.data[i] = 0;
-					//this.data[i+1] = 0;
-					//this.data[i+2] = 0;
+					
+					
 				}
 				//data[i];
 				//data[i+1];
@@ -163,7 +200,7 @@ app.main = {
 	
 	
 	
-	positionExists: function(indexToCheck)
+	positionExists: function(fromright, indexToCheck)
 	{
 		//if(indexToCheck > (WIDTH * HEIGHT))
 	}
