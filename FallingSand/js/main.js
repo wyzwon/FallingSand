@@ -117,17 +117,17 @@ app.main = {
 							{
 								
 								this.switchCells(i, this.rawData, this.below(i), this.data);
-								
+
 							}
 						}
 						
 						//check sides to make sure they exist then try to move left or right randomly
 						if(Math.floor((Math.random() * 2)) == 1)
 						{
-							if(i && this.isFluidOrVoid(i-4, this.rawData))
+							if((i>0) && this.isFluidOrVoid(i-4, this.rawData))
 							{
 								//make sure the particle can be swapped
-								if(!this.isSame(this.rawData, i, i-4) && this.isDenser(i,this.data,i-4) && this.isDenser(i,this.rawData,i-4))
+								if(!this.isSame(this.rawData, i, i-4) && this.isDenser(i,this.data,i-4) && this.isDenser(i,this.rawData,i-4) && this.isSameMulti(this.data, this.rawData, i, i) && this.isSameMulti(this.data, this.rawData, i-4, i-4))
 								{
 									//if the particle is moving through fluid, make it do so slower
 									if(!this.isBlack(this.data, i-4))
@@ -138,7 +138,7 @@ app.main = {
 										}
 									}
 									//if the particle can spread twice as fast, do so
-									else if((i-8 > 0) && this.isBlack(this.data, i-8))
+									else if((i-8 > 0) && this.isBlack(this.data, i-8) && this.isSameMulti(this.data, this.rawData, i-8, i-8))
 									{
 										this.switchCells(i, this.rawData, i-8, this.data);
 									}
@@ -146,13 +146,12 @@ app.main = {
 									{
 										this.switchCells(i, this.rawData, i-4, this.data);
 									}
-									
 								}
 							}
 						}
 						else
 						{
-							if(i < this.data.length-4 && this.isFluidOrVoid(i+4, this.rawData))
+							if(i < this.data.length-4 && this.isFluidOrVoid(i+4, this.rawData) && this.isSameMulti(this.data, this.rawData, i, i) && this.isSameMulti(this.data, this.rawData, i+4, i+4))
 							{
 								//make sure the particle can be swapped
 								if(!this.isSame(this.rawData, i, i+4) && this.isDenser(i,this.data,i+4))
@@ -166,7 +165,7 @@ app.main = {
 										}
 									}
 									//if the particle can spread twice as fast, do so
-									else if((i < this.data.length-8) && this.isBlack(this.data, i+8))
+									else if((i < this.data.length-8) && this.isBlack(this.data, i+8) && this.isSameMulti(this.data, this.rawData, i+8, i+8))
 									{
 										this.switchCells(i, this.rawData, i+8, this.data);
 									}
@@ -185,16 +184,17 @@ app.main = {
 					if(this.positionExists(iabove-8))
 					{
 						//count how many plant blocks are above this one within 7 squares
-						var treeCount = 0;
-						if(this.isPlant(this.data, iabove-4)){treeCount++;}
+						var treeCount = 0; //Note: this can be further nested when I am certain this is the plant set up I want
+						
 						if(this.isPlant(this.data, iabove)){treeCount++;}
-						if(this.isPlant(this.data, iabove+4)){treeCount++;}
-						if(this.isPlant(this.data, iabove+8)){treeCount++;}
-						if(this.isPlant(this.data, iabove-8)){treeCount++;}
-						if(this.isPlant(this.data, iabove+12)){treeCount++;}
-						if(this.isPlant(this.data, iabove-12)){treeCount++;}
-						if(this.isPlant(this.data, iabove+16)){treeCount++;}
-						if(this.isPlant(this.data, iabove-16)){treeCount++;}
+						if(this.isPlant(this.data, iabove-4)){treeCount++;}
+						if(!(treeCount > 2) && this.isPlant(this.data, iabove+4)){treeCount++;}
+						if(!(treeCount > 2) && this.isPlant(this.data, iabove+8)){treeCount++;}
+						if(!(treeCount > 2) && this.isPlant(this.data, iabove-8)){treeCount++;}
+						if(!(treeCount > 2) && this.isPlant(this.data, iabove+12)){treeCount++;}
+						if(!(treeCount > 2) && this.isPlant(this.data, iabove-12)){treeCount++;}
+						if(!(treeCount > 2) && this.isPlant(this.data, iabove+16)){treeCount++;}
+						if(!(treeCount > 2) && this.isPlant(this.data, iabove-16)){treeCount++;}
 						
 						//grow if its open enough
 						if(treeCount < 2)
@@ -245,7 +245,6 @@ app.main = {
 				}
 			}
 		}
-
 		
 		//apply changes
 		this.ctx.putImageData(this.imageData, 0, 0);
@@ -379,10 +378,17 @@ app.main = {
 			this.clearScene();
 		}.bind(this);
 		
-		/*document.querySelector("#backgroundRunSwitch").onchange = function(e){
-			document.getElementById("backgroundRunSwitch").checked = false;
-			this.clearScene();
-		}.bind(this);*/
+		document.querySelector("#lakeButton").onclick = function(e){
+			this.lakeScene();
+		}.bind(this);
+	},
+	
+	lithify: function()
+	{
+		for(var ib = 0; ib < this.data.length; ib += 4)
+		{
+			this.setStone(ib);
+		}
 	},
 	
 	//swap two given cells (cell_1, rawData, cell_2, data)
@@ -560,6 +566,13 @@ app.main = {
 		this.data[index+2] = 0;
 	},
 	
+	setStone: function(index)
+	{
+		this.data[index] = 136;
+		this.data[index+1] = 136;
+		this.data[index+2] = 136;
+	},
+	
 	pauseGame: function()
 	{
 		this.paused = true;
@@ -586,6 +599,14 @@ app.main = {
 		ctx.restore();
 	},
 	
+	lakeScene: function()
+	{
+		this.ctx.save();
+		this.ctx.fillStyle = "#0000ff";
+		this.ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
+		this.ctx.restore();
+	},
+	
 	clearScene: function()
 	{
 		this.ctx.save();
@@ -593,7 +614,7 @@ app.main = {
 		this.ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
 		this.ctx.restore();
 	}
-	
+
 }; // end app.main
 
 
