@@ -447,11 +447,16 @@ app.main = {
 	
 	getDensity: function(rValue, gValue, bValue)
 	{
+		
 		if((rValue > 0) && (rValue < 255))
 		{
 			if(rValue == 235)//sand //hex EB == dec 235
 			{
 				return 3;
+			}
+			else if(rValue == 35)
+			{
+				return 0.8;//oil 0.87307 g/cm^3
 			}
 			else //assume salt water
 			{
@@ -468,6 +473,10 @@ app.main = {
 			{
 				return 1;
 			}
+		}
+		else if(gValue > 0)
+		{
+			return -1; //make void negative density to ensure it never impedes particle dispersal
 		}
 		else
 		{
