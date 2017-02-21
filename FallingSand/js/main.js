@@ -122,61 +122,51 @@ app.main = {
 						}
 						
 						//check sides to make sure they exist then try to move left or right randomly
-						if(Math.floor((Math.random() * 2)) == 0)
+						var dispersalDirection = Math.floor((Math.random() * 2))
+						var rValue;
+						var gValue;
+						var bValue;
+						var farRValue;
+						
+						//adjust values for left or right travel
+						if(dispersalDirection == 0)
 						{
-							if((i>0) && this.isFluidOrVoid(i-4, this.rawData))
-							{
-								//make sure the particle can be swapped
-								if(!this.isSame(this.rawData, i, i-4) && this.isDenser(i,this.data,i-4) && this.isDenser(i,this.rawData,i-4) && this.isSameMulti(this.data, this.rawData, i, i) && this.isSameMulti(this.data, this.rawData, i-4, i-4))
-								{
-									//if the particle is moving through fluid, make it do so slower
-									if(!this.isBlack(this.data, i-4))
-									{
-										//var densityValue = Math.ceil(this.getDensity(this.rawData[i-4], this.rawData[i-3], this.rawData[i-2]));
-										//if(Math.floor((Math.random() * densityValue)) == 0)
-										if(Math.floor((Math.random() * Math.ceil(this.getDensity(this.rawData[i-4], this.rawData[i-3], this.rawData[i-2])))) == 0)
-										{
-											this.switchCells(i, this.rawData, i-4, this.data);
-										}
-									}
-									//if the particle can spread twice as fast, do so
-									else if((i-8 > 0) && this.isBlack(this.data, i-8) && this.isSameMulti(this.data, this.rawData, i-8, i-8))
-									{
-										this.switchCells(i, this.rawData, i-8, this.data);
-									}
-									else
-									{
-										this.switchCells(i, this.rawData, i-4, this.data);
-									}
-								}
-							}
+							rValue = i-4;
+							gValue = i-3;
+							bValue = i-2;
+							farRValue = i-8;
 						}
 						else
 						{
-							if(i < this.data.length-4 && this.isFluidOrVoid(i+4, this.rawData) && this.isSameMulti(this.data, this.rawData, i, i) && this.isSameMulti(this.data, this.rawData, i+4, i+4))
+							rValue = i+4;
+							gValue = i+5;
+							bValue = i+6;
+							farRValue = i+8;
+						}
+						
+						if(((dispersalDirection == 0 && (i>0)) || (dispersalDirection == 1 && i < this.data.length-4)) && this.isFluidOrVoid(rValue, this.rawData))
+						{
+							//make sure the particle can be swapped
+							if(!this.isSame(this.rawData, i, rValue) && this.isDenser(i,this.data,rValue) && this.isDenser(i,this.rawData,rValue) && this.isSameMulti(this.data, this.rawData, i, i) && this.isSameMulti(this.data, this.rawData, rValue, rValue))
 							{
-								//make sure the particle can be swapped
-								if(!this.isSame(this.rawData, i, i+4) && this.isDenser(i,this.data,i+4))
+								//if the particle is moving through fluid, make it do so slower
+								if(!this.isBlack(this.data, rValue))
 								{
-									//if the particle is moving through fluid, make it do so slower
-									if(!this.isBlack(this.rawData, i+4))
+									//var densityValue = Math.ceil(this.getDensity(this.rawData[i-4], this.rawData[i-3], this.rawData[i-2]));
+									//if(Math.floor((Math.random() * densityValue)) == 0)
+									if(Math.floor((Math.random() * Math.ceil(this.getDensity(this.rawData[rValue], this.rawData[gValue], this.rawData[bValue])))) == 0)
 									{
-										//var densityValue = Math.ceil(this.getDensity(this.rawData[i+4], this.rawData[i+5], this.rawData[i+6]));
-										//if(Math.floor((Math.random() * densityValue)) == 0)
-										if(Math.floor((Math.random() * Math.ceil(this.getDensity(this.rawData[i+4], this.rawData[i+5], this.rawData[i+6])))) == 0)
-										{
-											this.switchCells(i, this.rawData, i+4, this.data);
-										}
+										this.switchCells(i, this.rawData, rValue, this.data);
 									}
-									//if the particle can spread twice as fast, do so
-									else if((i < this.data.length-8) && this.isBlack(this.data, i+8) && this.isSameMulti(this.data, this.rawData, i+8, i+8))
-									{
-										this.switchCells(i, this.rawData, i+8, this.data);
-									}
-									else
-									{
-										this.switchCells(i, this.rawData, i+4, this.data);
-									}
+								}
+								//if the particle can spread twice as fast, do so
+								else if((farRValue > 0) && this.isBlack(this.data, farRValue) && this.isSameMulti(this.data, this.rawData, farRValue, farRValue))
+								{
+									this.switchCells(i, this.rawData, farRValue, this.data);
+								}
+								else
+								{
+									this.switchCells(i, this.rawData, rValue, this.data);
 								}
 							}
 						}
