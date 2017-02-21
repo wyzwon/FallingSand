@@ -122,7 +122,7 @@ app.main = {
 						}
 						
 						//check sides to make sure they exist then try to move left or right randomly
-						if(Math.floor((Math.random() * 2)) == 1)
+						if(Math.floor((Math.random() * 2)) == 0)
 						{
 							if((i>0) && this.isFluidOrVoid(i-4, this.rawData))
 							{
@@ -132,7 +132,9 @@ app.main = {
 									//if the particle is moving through fluid, make it do so slower
 									if(!this.isBlack(this.data, i-4))
 									{
-										if(Math.floor((Math.random() * 4)) == 1)
+										//var densityValue = Math.ceil(this.getDensity(this.rawData[i-4], this.rawData[i-3], this.rawData[i-2]));
+										//if(Math.floor((Math.random() * densityValue)) == 0)
+										if(Math.floor((Math.random() * Math.ceil(this.getDensity(this.rawData[i-4], this.rawData[i-3], this.rawData[i-2])))) == 0)
 										{
 											this.switchCells(i, this.rawData, i-4, this.data);
 										}
@@ -159,7 +161,9 @@ app.main = {
 									//if the particle is moving through fluid, make it do so slower
 									if(!this.isBlack(this.rawData, i+4))
 									{
-										if(Math.floor((Math.random() * 4)) == 1)
+										//var densityValue = Math.ceil(this.getDensity(this.rawData[i+4], this.rawData[i+5], this.rawData[i+6]));
+										//if(Math.floor((Math.random() * densityValue)) == 0)
+										if(Math.floor((Math.random() * Math.ceil(this.getDensity(this.rawData[i+4], this.rawData[i+5], this.rawData[i+6])))) == 0)
 										{
 											this.switchCells(i, this.rawData, i+4, this.data);
 										}
@@ -456,7 +460,7 @@ app.main = {
 			}
 			else if(rValue == 35)
 			{
-				return 0.8;//oil 0.87307 g/cm^3
+				return 0.8;//oil
 			}
 			else //assume salt water
 			{
@@ -629,8 +633,10 @@ app.main = {
 
 //density layers (higher (position) is lighter)
 
+//		g/cm^3
 
+//(crude) oil 0.87307
 //water 1
 //salt water 1.027
 //sand 1.920
-//salt 2.17
+//salt 2.1
