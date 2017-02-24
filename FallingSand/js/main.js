@@ -57,6 +57,8 @@ app.main = {
 		this.sandColor= "#EBEFA0";
 		
 		this.setupUI();
+		
+		//this.addEventListener("touchstart", onmousedown, false)
 
 		
 		// start the scene loop
@@ -74,7 +76,7 @@ app.main = {
 		}
 	 	
 		
-	 	var dt = this.calculateDeltaTime();
+	 	//var dt = this.calculateDeltaTime();
 	 	 
 
 		
@@ -94,29 +96,30 @@ app.main = {
 					//if the focused particle is fluid
 					if(this.isFluid(i,this.rawData))
 					{
+						var positionBelow = this.below(i);
 						//check if position below exists
-						if(this.positionExists(this.below(i), this.rawData))
+						if(this.positionExists(positionBelow, this.rawData))
 						{
 							//check if space below is empty
-							if(this.isBlack(this.rawData, this.below(i)))
+							if(this.isBlack(this.rawData, positionBelow))
 							{
 								
-								this.moveParticle(i, this.rawData, this.below(i), this.data);
+								this.moveParticle(i, this.rawData, positionBelow, this.data);
 								
 							}
 							
 							//attempt to merge
-							else if(this.tryMerge(i,this.below(i)))
+							else if(this.tryMerge(i,positionBelow))
 							{
 								//there was no reason not to put the merge code in the logic used to check if it was even possible
 							}
 							
 							
 							//attempt to sink
-							else if(this.isFluid(this.below(i), this.rawData) && (this.isDenser(i, this.rawData, this.below(i))) && (Math.floor((Math.random() * 2)) == 1)) //if the particle below is fluid and less dense and a 50 percent dice role passed
+							else if(this.isFluid(positionBelow, this.rawData) && (this.isDenser(i, this.rawData, positionBelow)) && (Math.floor((Math.random() * 2)) == 1)) //if the particle below is fluid and less dense and a 50 percent dice role passed
 							{
 								
-								this.switchCells(i, this.rawData, this.below(i), this.data);
+								this.switchCells(i, this.rawData, positionBelow, this.data);
 
 							}
 						}
@@ -190,7 +193,7 @@ app.main = {
 						if(!(treeCount > 2) && this.isPlant(this.data, iabove+16)){treeCount++;}
 						if(!(treeCount > 2) && this.isPlant(this.data, iabove-16)){treeCount++;}
 						
-						//grow if its open enough
+						//grow if it's open enough
 						if(treeCount < 2)
 						{
 							switch(Math.floor((Math.random() * 5)))
