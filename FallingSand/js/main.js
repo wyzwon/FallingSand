@@ -163,7 +163,7 @@ app.main = {
 									}
 								}
 								//if the particle can spread twice as fast, do so
-								else if((farRValue > 0) && this.isBlack(this.data, farRValue) && this.isSameMulti(this.data, this.rawData, farRValue, farRValue))
+								else if((farRValue > 0) && (farRValue < this.data.length-4) && this.isBlack(this.data, farRValue) && this.isSameMulti(this.data, this.rawData, farRValue, farRValue))
 								{
 									this.switchCells(i, this.rawData, farRValue, this.data);
 								}
@@ -377,6 +377,10 @@ app.main = {
 		
 		document.querySelector("#lakeButton").onclick = function(e){
 			this.lakeScene();
+		}.bind(this);
+		
+		document.querySelector("#logButton").onclick = function(e){
+			this.logScene();
 		}.bind(this);
 	},
 	
@@ -619,6 +623,11 @@ app.main = {
 		this.ctx.fillStyle = "black";
 		this.ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
 		this.ctx.restore();
+	},
+	
+	logScene: function()
+	{
+		console.log(this.rawData);
 	}
 
 }; // end app.main
