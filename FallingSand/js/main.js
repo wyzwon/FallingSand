@@ -193,7 +193,7 @@ app.main = {
 						if(!(treeCount > 2) && this.isPlant(this.data, iabove+16)){treeCount++;}
 						if(!(treeCount > 2) && this.isPlant(this.data, iabove-16)){treeCount++;}
 						
-						//grow if it's open enough
+						//grow if it's clear enough
 						if(treeCount < 2)
 						{
 							switch(Math.floor((Math.random() * 5)))
@@ -234,25 +234,12 @@ app.main = {
 								break;
 							}
 						}
-						/*else if(this.isWater(this.data, iabove) && Math.floor((Math.random() * 4)) == 1)
-						{
-							this.setBlack(iabove);
-						}*/
 					}
 				}
 			}
 		}
-		
-		//apply changes
+		// apply the changes to the scene
 		this.ctx.putImageData(this.imageData, 0, 0);
-		
-
-	
-
-	
-
-		
-
 	},
 	
 	
@@ -313,26 +300,26 @@ app.main = {
 	},
 	
 	
-	//check if the position physically exists in the array
+	// check if the position physically exists in the array
 	positionExists: function(indexToCheck)
 	{
 		return(indexToCheck < this.rawData.length && indexToCheck);
 	},
 	
-	//checks if black
+	// check if the cell is black
 	isBlack: function(data, indexLocation)
 	{
 		return(!data[indexLocation] && !data[indexLocation+1] && !data[indexLocation+2]);
 	},
 	
-	//check if water
+	// check if the cell is water
 	isWater: function(data, indexLocation)
 	{
 		return((data[indexLocation] == 0) && (data[indexLocation+1] == 0) && (data[indexLocation+2] == 255));
 		
 	},
 	
-	//check if plant
+	// check if the cell is plant
 	isPlant: function(data, indexLocation)
 	{
 		return(data[indexLocation+1] == 248);
@@ -340,7 +327,7 @@ app.main = {
 	},
 	
 	
-	//move particle (this moves it then erases the old space)
+	//move the particle (this moves it then erases the old space)
 	moveParticle: function(startIndex, startarray, destinationIndex, destinationArray)
 	{
 		//the new array gets the move changes
@@ -379,21 +366,17 @@ app.main = {
 			this.lakeScene();
 		}.bind(this);
 		
-		document.querySelector("#logButton").onclick = function(e){
-			this.logScene();
+		document.querySelector("#lakeBedButton").onclick = function(e){
+			this.lakeBedScene();
 		}.bind(this);
+		
+		/*document.querySelector("#logButton").onclick = function(e){
+			this.logScene();
+		}.bind(this);*/
 	},
 	
-	lithify: function()
-	{
-		for(var ib = 0; ib < this.data.length; ib += 4)
-		{
-			this.setStone(ib);
-		}
-	},
-	
-	//swap two given cells (cell_1, rawData, cell_2, data)
-	switchCells: function(index1, array1, index2, array2 )
+	//swap two given cells positions in a new array (cell_1, rawData, cell_2, data)
+	switchCells: function(index1, array1, index2, array2)
 	{
 		array2[index1] = array1[index2];
 		array2[index1+1] = array1[index2+1];
@@ -406,7 +389,7 @@ app.main = {
 		array2[index2+3] = array1[index1+3];
 	},
 	
-	
+	// check if this particle behaves like a fluid
 	isFluid: function(index,array)
 	{
 		//return (!(array[index] == 136)); //use till there are more solids
@@ -428,7 +411,7 @@ app.main = {
 		}
 	},
 	
-	//checks if the particle is fluid or void
+	// check if the particle is fluid or void
 	isFluidOrVoid: function(index,array)
 	{
 		//return (!(array[index] == 136)); //use till there are more solids
@@ -609,6 +592,14 @@ app.main = {
 		ctx.restore();
 	},
 	
+	clearScene: function()
+	{
+		this.ctx.save();
+		this.ctx.fillStyle = "black";
+		this.ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
+		this.ctx.restore();
+	},
+	
 	lakeScene: function()
 	{
 		this.ctx.save();
@@ -617,11 +608,20 @@ app.main = {
 		this.ctx.restore();
 	},
 	
-	clearScene: function()
+	lakeBedScene: function()
 	{
 		this.ctx.save();
-		this.ctx.fillStyle = "black";
+		this.ctx.fillStyle = "#0000ff";
 		this.ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
+		this.ctx.fillStyle = "#EBEFA0";
+		var sandfloor = Math.floor(this.HEIGHT / 7 * 6)
+		this.ctx.fillRect(0, sandfloor, this.WIDTH, this.HEIGHT);
+		this.ctx.fillStyle = "#00f800";
+		
+		// place plants on sand bed spaced at 1/3 and 2/3 width of the scene		
+		this.ctx.fillRect(Math.floor(this.WIDTH / 4 * 3), sandfloor, 2, 2); // note: dimensions must be an even integer in length or they are automatically anti-aliased
+		this.ctx.fillRect(Math.floor(this.WIDTH / 4), sandfloor, 2, 2);
+		
 		this.ctx.restore();
 	},
 	
