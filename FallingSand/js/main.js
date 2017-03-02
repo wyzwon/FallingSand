@@ -175,67 +175,8 @@ app.main = {
 						}
 					}
 				}
-				if(this.rawData[i+1] == 248)
-				{
-					var iabove = this.above(i);
-					if(this.positionExists(iabove-8))
-					{
-						//count how many plant blocks are above this one within 7 squares
-						var treeCount = 0; //Note: this can be further nested when I am certain this is the plant set up I want
-						
-						if(this.isPlant(this.data, iabove)){treeCount++;}
-						if(this.isPlant(this.data, iabove-4)){treeCount++;}
-						if(!(treeCount > 2) && this.isPlant(this.data, iabove+4)){treeCount++;}
-						if(!(treeCount > 2) && this.isPlant(this.data, iabove+8)){treeCount++;}
-						if(!(treeCount > 2) && this.isPlant(this.data, iabove-8)){treeCount++;}
-						if(!(treeCount > 2) && this.isPlant(this.data, iabove+12)){treeCount++;}
-						if(!(treeCount > 2) && this.isPlant(this.data, iabove-12)){treeCount++;}
-						if(!(treeCount > 2) && this.isPlant(this.data, iabove+16)){treeCount++;}
-						if(!(treeCount > 2) && this.isPlant(this.data, iabove-16)){treeCount++;}
-						
-						//grow if it's clear enough
-						if(treeCount < 2)
-						{
-							switch(Math.floor((Math.random() * 5)))
-							{
-								case 0:
-									if(this.isWater(this.data, iabove-4))
-									{
-										this.setPlant(iabove-4);
-									}
-								break;
-								
-								case 1:
-									if(this.isWater(this.data, iabove))
-									{
-										this.setPlant(iabove);
-									}
-								break;
-								
-								case 2:
-									if(this.isWater(this.data, iabove+4))
-									{
-										this.setPlant(iabove+4);
-									}
-								break;
-								
-								case 3:
-									if(this.isWater(this.data, iabove+8))
-									{
-										this.setPlant(iabove+8);
-									}
-								break;
-								
-								case 4:
-									if(this.isWater(this.data, iabove-8))
-									{
-										this.setPlant(iabove-8);
-									}
-								break;
-							}
-						}
-					}
-				}
+				this.plantGrow(this.rawData, this.data, i);
+				
 			}
 		}
 		// apply the changes to the scene
@@ -327,7 +268,7 @@ app.main = {
 	},
 	
 	
-	//move the particle (this moves it then erases the old space)
+	//move the particle (this moves it then erases the old space (sets to void))
 	moveParticle: function(startIndex, startarray, destinationIndex, destinationArray)
 	{
 		//the new array gets the move changes
@@ -540,6 +481,71 @@ app.main = {
 		else
 		{
 			return false; //particle does not react with anything
+		}
+	},
+	
+	plantGrow: function(oldArray, newArray, index)
+	{
+		if(oldArray[index+1] == 248)
+		{
+			var iabove = this.above(index);
+			if(this.positionExists(iabove-8))
+			{
+				//count how many plant blocks are above this one within 7 squares
+				var treeCount = 0; //Note: this can be further nested when I am certain this is the plant set up I want
+				
+				if(this.isPlant(newArray, iabove)){treeCount++;}
+				if(this.isPlant(newArray, iabove-4)){treeCount++;}
+				if(!(treeCount > 2) && this.isPlant(newArray, iabove+4)){treeCount++;}
+				if(!(treeCount > 2) && this.isPlant(newArray, iabove+8)){treeCount++;}
+				if(!(treeCount > 2) && this.isPlant(newArray, iabove-8)){treeCount++;}
+				if(!(treeCount > 2) && this.isPlant(newArray, iabove+12)){treeCount++;}
+				if(!(treeCount > 2) && this.isPlant(newArray, iabove-12)){treeCount++;}
+				if(!(treeCount > 2) && this.isPlant(newArray, iabove+16)){treeCount++;}
+				if(!(treeCount > 2) && this.isPlant(newArray, iabove-16)){treeCount++;}
+				
+				//grow if it's clear enough
+				if(treeCount < 2)
+				{
+					switch(Math.floor((Math.random() * 5)))
+					{
+						case 0:
+							if(this.isWater(newArray, iabove-4))
+							{
+								this.setPlant(iabove-4);
+							}
+						break;
+						
+						case 1:
+							if(this.isWater(newArray, iabove))
+							{
+								this.setPlant(iabove);
+							}
+						break;
+						
+						case 2:
+							if(this.isWater(newArray, iabove+4))
+							{
+								this.setPlant(iabove+4);
+							}
+						break;
+						
+						case 3:
+							if(this.isWater(newArray, iabove+8))
+							{
+								this.setPlant(iabove+8);
+							}
+						break;
+						
+						case 4:
+							if(this.isWater(newArray, iabove-8))
+							{
+								this.setPlant(iabove-8);
+							}
+						break;
+					}
+				}
+			}
 		}
 	},
 	
