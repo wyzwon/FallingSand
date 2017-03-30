@@ -126,3 +126,8 @@ function circlesIntersect(c1,c2)
 	return distance < c1.radius + c2.radius;
 }
 
+function resizeCanvas() {
+            //canvas.width = window.innerWidth;
+            //canvas.height = window.innerHeight;
+        }
+

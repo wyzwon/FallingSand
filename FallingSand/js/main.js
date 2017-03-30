@@ -5,8 +5,7 @@
 
 "use strict";
 
-// if app exists use the existing copy
-// else create a new object literal
+//app singleton
 var app = app || {};
 
 
@@ -15,8 +14,10 @@ app.main = {
 	paused: false,
 	animationID: 0,
 	
-    WIDTH : 600, 
-    HEIGHT: 400,
+    WIDTH : 0,
+	HEIGHT: 400,
+	MAXWIDTH : 600, //max possible width
+	PREFEREDWIDTH : Math.floor(window.innerWidth) - 32,
 	WIDTHPIX: undefined,
 	HEIGHTPIX: undefined,
     canvas: undefined,
@@ -34,14 +35,20 @@ app.main = {
 	
     // methods
 	init : function() {
-		//console.log("app.main.init() called");
 		// initialize properties
 		this.canvas = document.querySelector('canvas');
+		if (this.PREFEREDWIDTH > this.MAXWIDTH){
+			this.WIDTH = this.MAXWIDTH; // limit size to maintain performance
+		}
+		else{
+			this.WIDTH = this.PREFEREDWIDTH; // shrink to fit smaller pages
+		}
 		this.canvas.width = this.WIDTH;
 		this.canvas.height = this.HEIGHT;
 		this.ctx = this.canvas.getContext('2d');
 		this.dragging = false;
 		this.penSize = 30;
+		
 		
 		this.WIDTHPIX = this.WIDTH * 4,
 		this.HEIGHTPIX = this.HEIGHT * 4,
@@ -53,6 +60,9 @@ app.main = {
 		this.canvas.onmousemove = this.doMousemove.bind(this);
 		this.canvas.onmouseup = this.doMouseup.bind(this);
 		this.canvas.onmouseout = this.doMouseout.bind(this);
+		
+		this.canvas.touchstart = this.doTouchstart.bind(this);
+		this.canvas.touchmove = this.doTouchmove.bind(this);
 		
 		this.sandColor= "#EBEFA0";
 		
@@ -200,10 +210,22 @@ app.main = {
 	
 	
 	
+	
+	
+	
+	doTouchmove: function(e)
+	{
+		console.log("touchmove noticed");
+		this.dragging = true;
+		e.preventDefault();
+	},
 
 	
-    
-	
+    doTouchstart: function(e)
+	{
+		console.log("touch noticed");
+		doMousedown(e);
+	},
 	
 	
 	doMousedown: function(e)
@@ -484,28 +506,29 @@ app.main = {
 		}
 	},
 	
+	// check that the index is a plant and attempt to grow given the right conditions
 	plantGrow: function(oldArray, newArray, index)
 	{
 		if(oldArray[index+1] == 248)
 		{
 			var iabove = this.above(index);
-			if(this.positionExists(iabove-8))
+			if(this.positionExists(iabove-16))
 			{
 				//count how many plant blocks are above this one within 7 squares
-				var treeCount = 0; //Note: this can be further nested when I am certain this is the plant set up I want
+				var plantCount = 0;
 				
-				if(this.isPlant(newArray, iabove)){treeCount++;}
-				if(this.isPlant(newArray, iabove-4)){treeCount++;}
-				if(!(treeCount > 2) && this.isPlant(newArray, iabove+4)){treeCount++;}
-				if(!(treeCount > 2) && this.isPlant(newArray, iabove+8)){treeCount++;}
-				if(!(treeCount > 2) && this.isPlant(newArray, iabove-8)){treeCount++;}
-				if(!(treeCount > 2) && this.isPlant(newArray, iabove+12)){treeCount++;}
-				if(!(treeCount > 2) && this.isPlant(newArray, iabove-12)){treeCount++;}
-				if(!(treeCount > 2) && this.isPlant(newArray, iabove+16)){treeCount++;}
-				if(!(treeCount > 2) && this.isPlant(newArray, iabove-16)){treeCount++;}
+				if(this.isPlant(newArray, iabove)){plantCount++;}
+				if(this.isPlant(newArray, iabove-4)){plantCount++;}
+				if(this.isPlant(newArray, iabove+4)){plantCount++;}
+				if(plantCount < 3 && this.isPlant(newArray, iabove+8)){plantCount++;}
+				if(plantCount < 3 && this.isPlant(newArray, iabove-8)){plantCount++;}
+				if(plantCount < 3 && this.isPlant(newArray, iabove+12)){plantCount++;}
+				if(plantCount < 3 && this.isPlant(newArray, iabove-12)){plantCount++;}
+				if(plantCount < 3 && this.isPlant(newArray, iabove+16)){plantCount++;}
+				if(plantCount < 3 && this.isPlant(newArray, iabove-16)){plantCount++;}
 				
 				//grow if it's clear enough
-				if(treeCount < 2)
+				if(plantCount < 2)
 				{
 					switch(Math.floor((Math.random() * 5)))
 					{

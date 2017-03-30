@@ -3,23 +3,39 @@
 
 <head>
 	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" >
+	
 	<link href='https://fonts.googleapis.com/css?family=Questrial' rel='stylesheet' type='text/css'>
 	
 	
-	<link rel="icon" href="../assets/SourceImages/favicon.ico" type="image/x-icon"/>
-	<link rel="icon" href="../assets/SourceImages/logo217long.png" type="image/png"/>
-	<link rel="shortcut icon" href="../assets/SourceImages/favicon.ico" type="image/x-icon"/>
-	<link rel="apple-touch-icon" href="../assets/SourceImages/favicon.ico">
+	<link rel="icon" href="../../assets/SourceImages/favicon.ico" type="image/x-icon"/>
+	<link rel="icon" href="../../assets/SourceImages/logo217long.png" type="image/png"/>
+	<link rel="shortcut icon" href="../../assets/SourceImages/favicon.ico" type="image/x-icon"/>
+	<link rel="apple-touch-icon" href="../../assets/SourceImages/favicon.ico">
 	
 	<style>
+	@-ms-viewport{
+	width: device-width;
+	}
+	
 	body{
 	font-family: 'Questrial', helvetica, sans serif;
 	background: #666666;
+	touch-action: pan-y;
+	padding:0px 0px 0px 0px;
 	}
 	
 	canvas{
 	border:1px solid gray;
 	image-rendering: crisp-edges;
+	vertical-align: middle
+	}
+	
+	#controls{
+	border:10px solid #666666;
+	}
+	
+	#text{
 	}
 	
 	.switch {
@@ -83,15 +99,20 @@
 </head>
 
 <body>
-	<canvas width="600" height="600">
+	<canvas id="canvas" style="touch-action: none;">
 		Error: The content could not be displayed because your browser does not support Canvas. Canvas is supported in the latest versions of all modern
-					web browsers such as Chrome, firefox, Opera, Safari, Edge, and Internet Explorer 9 and up.
+					web browsers such as:
+					<ul>
+						<li>Chrome</li>
+						<li>Firefox</li>
+						<li>Opera</li>
+						<li>Safari</li>
+						<li>Edge</li>
+						<li>Internet Explorer 9 and up</li>
+					</ul>
 	</canvas>
 	
 	
-	
-	
-
 	<div id="controls">
 		<label>Sand Types
 			<select id="sandType">
@@ -126,7 +147,7 @@
 	<div id="text">
 		<span><br><br>Instructions: <br></span>
 		<div id="instructionParagraph">
-			<span>Select the sand type you want from the drop down menu. <br> Click and drag to draw on screen. </span>
+			<div>Select the sand type you want <br>from the drop down menu. <br> Click and drag to draw on screen. </div>
 		</div>
 		<span><br>By: Thomas Bouffard</span>
 	</div>
@@ -134,8 +155,5 @@
 	<script src='js/utilities.js'></script>
 	<script src='js/loader.js'></script>
 	<script src='js/main.js'></script>
-	
-	
 </body>
-
 </html>
