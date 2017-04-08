@@ -5,18 +5,18 @@
 
 "use strict";
 
-//app singleton
+// app singleton
 var app = app || {};
 
 
 app.main = {
-	//properties
+	// properties
 	paused: false,
 	animationID: 0,
 	
     WIDTH : 0,
 	HEIGHT: 400,
-	MAXWIDTH : 600, //max possible width
+	MAXWIDTH : 600, // max possible width
 	PREFEREDWIDTH : Math.floor(window.innerWidth) - 32,
 	WIDTHPIX: undefined,
 	HEIGHTPIX: undefined,
@@ -68,7 +68,7 @@ app.main = {
 		
 		this.setupUI();
 		
-		//this.addEventListener("touchstart", onmousedown, false)
+		// this.addEventListener("touchstart", onmousedown, false)
 
 		
 		// start the scene loop
@@ -86,7 +86,7 @@ app.main = {
 		}
 	 	
 		
-	 	//var dt = this.calculateDeltaTime();
+	 	// var dt = this.calculateDeltaTime();
 	 	 
 
 		
@@ -94,54 +94,50 @@ app.main = {
 		this.newFrameArray = this.imageData.data; //make a copy of the array that will store changes to the scene to push back to the canvas
 		this.oldFrameArray = this.newFrameArray.slice(0); // make a copy of the unmodified array data to iterate through
 		
-		//iterate through every cell in the canvas
+		// iterate through every cell in the canvas
 		for(var i = 0; i < this.newFrameArray.length; i += 4)
 		{
-			//if position has a color
+			// if position has a color
 			if(!this.isBlack(this.oldFrameArray, i))
 			{
-				//if the particle is the same in both arrays (aka: has not been modified)
+				// if the particle is the same in both arrays (aka: has not been modified)
 				if(this.isSameMulti(this.oldFrameArray, this.newFrameArray, i, i))
 				{
-					//if the focused particle is fluid
+					// if the focused particle is fluid
 					if(this.isFluid(i,this.oldFrameArray))
 					{
 						var positionBelow = this.below(i);
-						//check if position below exists
+						// check if position below exists
 						if(this.positionExists(positionBelow, this.oldFrameArray))
 						{
-							//check if space below is empty
+							// check if space below is empty
 							if(this.isBlack(this.oldFrameArray, positionBelow))
 							{
-								
 								this.moveParticle(i, this.oldFrameArray, positionBelow, this.newFrameArray);
-								
 							}
 							
-							//attempt to merge
+							// attempt to merge
 							else if(this.tryMerge(i,positionBelow))
 							{
 								//there was no reason not to put the merge code in the logic used to check if it was even possible
 							}
 							
 							
-							//attempt to sink
+							// attempt to sink
 							else if(this.isFluid(positionBelow, this.oldFrameArray) && (this.isDenser(i, this.oldFrameArray, positionBelow)) && (Math.floor((Math.random() * 2)) == 1)) //if the particle below is fluid and less dense and a 50 percent dice role passed
 							{
-								
 								this.switchCells(i, this.oldFrameArray, positionBelow, this.newFrameArray);
-
 							}
 						}
 						
-						//check sides to make sure they exist then try to move left or right randomly
+						// check sides to make sure they exist then try to move left or right randomly
 						var dispersalDirection = Math.floor((Math.random() * 2))
 						var rValue;
 						var gValue;
 						var bValue;
 						var farRValue;
 						
-						//adjust values for left or right travel
+						// adjust values for left or right travel
 						if(dispersalDirection == 0)
 						{
 							rValue = i-4;
@@ -159,20 +155,20 @@ app.main = {
 						
 						if(((dispersalDirection == 0 && (i>0)) || (dispersalDirection == 1 && i < this.newFrameArray.length-4)) && this.isFluidOrVoid(rValue, this.oldFrameArray))
 						{
-							//make sure the particle can be swapped
+							// make sure the particle can be swapped
 							if(!this.isSame(this.oldFrameArray, i, rValue) && this.isDenser(i,this.newFrameArray,rValue) && this.isDenser(i,this.oldFrameArray,rValue) && this.isSameMulti(this.newFrameArray, this.oldFrameArray, i, i) && this.isSameMulti(this.newFrameArray, this.oldFrameArray, rValue, rValue))
 							{
-								//if the particle is moving through fluid, make it do so slower
+								// if the particle is moving through fluid, make it do so slower
 								if(!this.isBlack(this.newFrameArray, rValue))
 								{
-									//var densityValue = Math.ceil(this.getDensity(this.oldFrameArray[i-4], this.oldFrameArray[i-3], this.oldFrameArray[i-2]));
-									//if(Math.floor((Math.random() * densityValue)) == 0)
+									// var densityValue = Math.ceil(this.getDensity(this.oldFrameArray[i-4], this.oldFrameArray[i-3], this.oldFrameArray[i-2]));
+									// if(Math.floor((Math.random() * densityValue)) == 0)
 									if(Math.floor((Math.random() * Math.ceil(this.getDensity(this.oldFrameArray[rValue], this.oldFrameArray[gValue], this.oldFrameArray[bValue])))) == 0)
 									{
 										this.switchCells(i, this.oldFrameArray, rValue, this.newFrameArray);
 									}
 								}
-								//if the particle can spread twice as fast, do so
+								// if the particle can spread twice as fast, do so
 								else if((farRValue > 0) && (farRValue < this.newFrameArray.length-4) && this.isBlack(this.newFrameArray, farRValue) && this.isSameMulti(this.newFrameArray, this.oldFrameArray, farRValue, farRValue))
 								{
 									this.switchCells(i, this.oldFrameArray, farRValue, this.newFrameArray);
@@ -195,8 +191,8 @@ app.main = {
 	
 	
 
-	
-	calculateDeltaTime: function(){
+	// calculate the delta time
+	/*calculateDeltaTime: function(){
 		// + calls Date.valueOf(), which converts it from an object to a 	
 		// primitive (number of milliseconds since January 1, 1970 local time)
 		var now,fps;
@@ -205,7 +201,7 @@ app.main = {
 		fps = clamp(fps, 12, 60);
 		this.lastTime = now; 
 		return 1/fps;
-	},
+	},*/
 	
 	
 	
@@ -279,29 +275,29 @@ app.main = {
 	isWater: function(newFrameArray, indexLocation)
 	{
 		return((newFrameArray[indexLocation] == 0) && (newFrameArray[indexLocation+1] == 0) && (newFrameArray[indexLocation+2] == 255));
-		
 	},
 	
 	// check if the cell is plant
 	isPlant: function(newFrameArray, indexLocation)
 	{
 		return(newFrameArray[indexLocation+1] == 248);
-		
 	},
 	
 	// check if the cell is sand
 	isSand: function(newFrameArray, indexLocation)
 	{
 		return(newFrameArray[indexLocation] == 235);
-		
 	},
 	
 	isBiomass: function(newFrameArray, indexLocation)
 	{
 		return(newFrameArray[indexLocation] == 140);
-		
 	},
 	
+	isStone: function(newFrameArray, indexLocation)
+	{
+		return(newFrameArray[indexLocation] == 136);
+	},
 	
 	//move the particle (this moves it then erases the old space (sets to void))
 	moveParticle: function(startIndex, startarray, destinationIndex, destinationArray)
@@ -368,35 +364,13 @@ app.main = {
 	// returns true if this particle behaves like a fluid
 	isFluid: function(index,array)
 	{
-		if(array[index] == 136 || this.isBlack(array, index) || this.isBiomass(array, index)) //hex 88 -> dec 136
-		{
-			return false;
-		}
-		else if(this.isPlant(array, index)) //hex f8 -> dec 248
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}
+		return (!(this.isStone(array, index) || this.isBlack(array, index) || this.isBiomass(array, index) || this.isPlant(array, index))); //hex 88 -> dec 136 stone, hex f8 -> dec 248 plant
 	},
 	
 	// returns true if the particle is fluid or void
 	isFluidOrVoid: function(index,array)
 	{
-		if(array[index] == 136 || this.isBiomass(array, index)) //hex 88 -> dec 136
-		{
-			return false;
-		}
-		else if(array[index + 1] == 248)
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}
+		return (this.isFluid(index,array) || this.isBlack(array, index));
 	},
 	
 	getDensity: function(rValue, gValue, bValue)
@@ -430,44 +404,45 @@ app.main = {
 		}
 		else if(gValue > 0)
 		{
-			return -1; //make void negative density to ensure it never impedes particle dispersal
+			return -1;//make void negative density to ensure it never impedes particle dispersal
 		}
 		else
 		{
-			return 0;//unknown but hey let it float
+			return 0;// unknown but hey let it float
 		}
 	},
 	
-	//tell if objects are the same
+	// return true if objects are the same
 	isSame: function(array, index1, index2)
 	{
 		return (array[index1] == array[index2] && array[index1+1] == array[index2+1] && array[index1+2] == array[index2+2]);
 	},
 	
-	//tell if objects in different arrays are the same
+	// return true if objects in different arrays are the same
 	isSameMulti: function(array, array2, index1, index2)
 	{
 		return (array[index1] == array2[index2] && array[index1+1] == array2[index2+1] && array[index1+2] == array2[index2+2]);
 	},
 	
-	//declare if object one is denser then object two
+	// returns true if object one is denser then object two
 	isDenser: function(index1, array, index2) // object1 array object2
 	{
 		return(this.getDensity(array[index1], array[index1+1], array[index1+2]) > this.getDensity(array[index2], array[index2+1], array[index2+2]));
 	},
 	
-	//returns the index above focused cells
+	// returns the index above focused cells
 	above: function(index)
 	{
 		return (index - this.WIDTHPIX);
 	},
 	
-	//returns the index below focused cells
+	// returns the index below focused cells
 	below: function(index)
 	{
 		return (index + this.WIDTHPIX);
 	},
 	
+	// atempt to merge two material cells into a different material
 	tryMerge: function(index,lowerIndex)
 	{
 		
@@ -679,8 +654,9 @@ app.main = {
 		this.ctx.fillRect(0, sandfloor, this.WIDTH, this.HEIGHT);
 		this.ctx.fillStyle = "#00f800";
 		
-		// place plants on sand bed spaced at 1/3 and 2/3 width of the scene		
-		this.ctx.fillRect(Math.floor(this.WIDTH / 4 * 3), sandfloor, 2, 2); // note: dimensions must be an even integer in length or they are automatically anti-aliased
+		// place plants on sand bed spaced at 1/3 and 2/3 width of the scene
+		// note: dimensions must be an even integer in length or they are automatically anti-aliased
+		this.ctx.fillRect(Math.floor(this.WIDTH / 4 * 3), sandfloor, 2, 2); 
 		this.ctx.fillRect(Math.floor(this.WIDTH / 4), sandfloor, 2, 2);
 		
 		this.ctx.restore();
@@ -694,12 +670,12 @@ app.main = {
 }; // end app.main
 
 
-//density layers (higher (position) is lighter)
+// density layers (higher (position) is lighter)
 
-//		g/cm^3
+// g/cm^3
 
-//(crude) oil 0.87307
-//water 1
-//salt water 1.027
-//sand 1.920
-//salt 2.1
+// (crude) oil 0.87307
+// water 1
+// salt water 1.027
+// sand 1.920
+// salt 2.1
