@@ -27,8 +27,8 @@ app.main = {
    	lastTime: 0, // used by calculateDeltaTime() 
 	
 	imageData: undefined,
-	data: undefined,
-	rawData: undefined,
+	newFrameArray: undefined,
+	oldFrameArray: undefined,
 	sandColor: "#EBEFA0",
 
 
@@ -91,30 +91,30 @@ app.main = {
 
 		
 		this.imageData = this.ctx.getImageData(0,0,this.canvas.width,this.canvas.height);
-		this.data = this.imageData.data; //data to manipulate
-		this.rawData = this.data.slice(0); //unmodified data to reference
+		this.newFrameArray = this.imageData.data; //make a copy of the array that will store changes to the scene to push back to the canvas
+		this.oldFrameArray = this.newFrameArray.slice(0); // make a copy of the unmodified array data to iterate through
 		
 		//iterate through every cell in the canvas
-		for(var i = 0; i < this.data.length; i += 4)
+		for(var i = 0; i < this.newFrameArray.length; i += 4)
 		{
 			//if position has a color
-			if(!this.isBlack(this.rawData, i))
+			if(!this.isBlack(this.oldFrameArray, i))
 			{
 				//if the particle is the same in both arrays (aka: has not been modified)
-				if(this.isSameMulti(this.rawData, this.data, i, i))
+				if(this.isSameMulti(this.oldFrameArray, this.newFrameArray, i, i))
 				{
 					//if the focused particle is fluid
-					if(this.isFluid(i,this.rawData))
+					if(this.isFluid(i,this.oldFrameArray))
 					{
 						var positionBelow = this.below(i);
 						//check if position below exists
-						if(this.positionExists(positionBelow, this.rawData))
+						if(this.positionExists(positionBelow, this.oldFrameArray))
 						{
 							//check if space below is empty
-							if(this.isBlack(this.rawData, positionBelow))
+							if(this.isBlack(this.oldFrameArray, positionBelow))
 							{
 								
-								this.moveParticle(i, this.rawData, positionBelow, this.data);
+								this.moveParticle(i, this.oldFrameArray, positionBelow, this.newFrameArray);
 								
 							}
 							
@@ -126,10 +126,10 @@ app.main = {
 							
 							
 							//attempt to sink
-							else if(this.isFluid(positionBelow, this.rawData) && (this.isDenser(i, this.rawData, positionBelow)) && (Math.floor((Math.random() * 2)) == 1)) //if the particle below is fluid and less dense and a 50 percent dice role passed
+							else if(this.isFluid(positionBelow, this.oldFrameArray) && (this.isDenser(i, this.oldFrameArray, positionBelow)) && (Math.floor((Math.random() * 2)) == 1)) //if the particle below is fluid and less dense and a 50 percent dice role passed
 							{
 								
-								this.switchCells(i, this.rawData, positionBelow, this.data);
+								this.switchCells(i, this.oldFrameArray, positionBelow, this.newFrameArray);
 
 							}
 						}
@@ -157,35 +157,35 @@ app.main = {
 							farRValue = i+8;
 						}
 						
-						if(((dispersalDirection == 0 && (i>0)) || (dispersalDirection == 1 && i < this.data.length-4)) && this.isFluidOrVoid(rValue, this.rawData))
+						if(((dispersalDirection == 0 && (i>0)) || (dispersalDirection == 1 && i < this.newFrameArray.length-4)) && this.isFluidOrVoid(rValue, this.oldFrameArray))
 						{
 							//make sure the particle can be swapped
-							if(!this.isSame(this.rawData, i, rValue) && this.isDenser(i,this.data,rValue) && this.isDenser(i,this.rawData,rValue) && this.isSameMulti(this.data, this.rawData, i, i) && this.isSameMulti(this.data, this.rawData, rValue, rValue))
+							if(!this.isSame(this.oldFrameArray, i, rValue) && this.isDenser(i,this.newFrameArray,rValue) && this.isDenser(i,this.oldFrameArray,rValue) && this.isSameMulti(this.newFrameArray, this.oldFrameArray, i, i) && this.isSameMulti(this.newFrameArray, this.oldFrameArray, rValue, rValue))
 							{
 								//if the particle is moving through fluid, make it do so slower
-								if(!this.isBlack(this.data, rValue))
+								if(!this.isBlack(this.newFrameArray, rValue))
 								{
-									//var densityValue = Math.ceil(this.getDensity(this.rawData[i-4], this.rawData[i-3], this.rawData[i-2]));
+									//var densityValue = Math.ceil(this.getDensity(this.oldFrameArray[i-4], this.oldFrameArray[i-3], this.oldFrameArray[i-2]));
 									//if(Math.floor((Math.random() * densityValue)) == 0)
-									if(Math.floor((Math.random() * Math.ceil(this.getDensity(this.rawData[rValue], this.rawData[gValue], this.rawData[bValue])))) == 0)
+									if(Math.floor((Math.random() * Math.ceil(this.getDensity(this.oldFrameArray[rValue], this.oldFrameArray[gValue], this.oldFrameArray[bValue])))) == 0)
 									{
-										this.switchCells(i, this.rawData, rValue, this.data);
+										this.switchCells(i, this.oldFrameArray, rValue, this.newFrameArray);
 									}
 								}
 								//if the particle can spread twice as fast, do so
-								else if((farRValue > 0) && (farRValue < this.data.length-4) && this.isBlack(this.data, farRValue) && this.isSameMulti(this.data, this.rawData, farRValue, farRValue))
+								else if((farRValue > 0) && (farRValue < this.newFrameArray.length-4) && this.isBlack(this.newFrameArray, farRValue) && this.isSameMulti(this.newFrameArray, this.oldFrameArray, farRValue, farRValue))
 								{
-									this.switchCells(i, this.rawData, farRValue, this.data);
+									this.switchCells(i, this.oldFrameArray, farRValue, this.newFrameArray);
 								}
 								else
 								{
-									this.switchCells(i, this.rawData, rValue, this.data);
+									this.switchCells(i, this.oldFrameArray, rValue, this.newFrameArray);
 								}
 							}
 						}
 					}
 				}
-				this.plantGrow(this.rawData, this.data, i);
+				this.plantGrow(this.oldFrameArray, this.newFrameArray, i);
 				
 			}
 		}
@@ -266,26 +266,39 @@ app.main = {
 	// check if the position physically exists in the array
 	positionExists: function(indexToCheck)
 	{
-		return(indexToCheck < this.rawData.length && indexToCheck);
+		return(indexToCheck < this.oldFrameArray.length && indexToCheck);
 	},
 	
 	// check if the cell is black
-	isBlack: function(data, indexLocation)
+	isBlack: function(newFrameArray, indexLocation)
 	{
-		return(!data[indexLocation] && !data[indexLocation+1] && !data[indexLocation+2]);
+		return(!newFrameArray[indexLocation] && !newFrameArray[indexLocation+1] && !newFrameArray[indexLocation+2]);
 	},
 	
 	// check if the cell is water
-	isWater: function(data, indexLocation)
+	isWater: function(newFrameArray, indexLocation)
 	{
-		return((data[indexLocation] == 0) && (data[indexLocation+1] == 0) && (data[indexLocation+2] == 255));
+		return((newFrameArray[indexLocation] == 0) && (newFrameArray[indexLocation+1] == 0) && (newFrameArray[indexLocation+2] == 255));
 		
 	},
 	
 	// check if the cell is plant
-	isPlant: function(data, indexLocation)
+	isPlant: function(newFrameArray, indexLocation)
 	{
-		return(data[indexLocation+1] == 248);
+		return(newFrameArray[indexLocation+1] == 248);
+		
+	},
+	
+	// check if the cell is sand
+	isSand: function(newFrameArray, indexLocation)
+	{
+		return(newFrameArray[indexLocation] == 235);
+		
+	},
+	
+	isBiomass: function(newFrameArray, indexLocation)
+	{
+		return(newFrameArray[indexLocation] == 140);
 		
 	},
 	
@@ -338,7 +351,7 @@ app.main = {
 		}.bind(this);*/
 	},
 	
-	//swap two given cells positions in a new array (cell_1, rawData, cell_2, data)
+	// swap two given cells positions in a new array (cell_1, oldFrameArray, cell_2, newFrameArray)
 	switchCells: function(index1, array1, index2, array2)
 	{
 		array2[index1] = array1[index2];
@@ -352,19 +365,14 @@ app.main = {
 		array2[index2+3] = array1[index1+3];
 	},
 	
-	// check if this particle behaves like a fluid
+	// returns true if this particle behaves like a fluid
 	isFluid: function(index,array)
 	{
-		//return (!(array[index] == 136)); //use till there are more solids
-		if(array[index] == 136) //hex 88 -> dec 136
+		if(array[index] == 136 || this.isBlack(array, index) || this.isBiomass(array, index)) //hex 88 -> dec 136
 		{
 			return false;
 		}
-		else if(this.isBlack(array, index))
-		{
-			return false;
-		}
-		else if(array[index + 1] == 248) //hex f8 -> dec 248
+		else if(this.isPlant(array, index)) //hex f8 -> dec 248
 		{
 			return false;
 		}
@@ -374,11 +382,10 @@ app.main = {
 		}
 	},
 	
-	// check if the particle is fluid or void
+	// returns true if the particle is fluid or void
 	isFluidOrVoid: function(index,array)
 	{
-		//return (!(array[index] == 136)); //use till there are more solids
-		if(array[index] == 136) //hex 88 -> dec 136
+		if(array[index] == 136 || this.isBiomass(array, index)) //hex 88 -> dec 136
 		{
 			return false;
 		}
@@ -465,35 +472,35 @@ app.main = {
 	{
 		
 		//determine the first object and compare the second to its list of reactants then reacts if able
-		if((this.rawData[index] == 255) && (this.rawData[index+1] == 255) && (this.rawData[index + 2] == 255)) //is salt
+		if((this.oldFrameArray[index] == 255) && (this.oldFrameArray[index+1] == 255) && (this.oldFrameArray[index + 2] == 255)) //is salt
 		{
 			
-			if((this.rawData[lowerIndex] == 0) && (this.rawData[lowerIndex+1] == 0) && (this.rawData[lowerIndex + 2] == 255)) //is water
+			if((this.oldFrameArray[lowerIndex] == 0) && (this.oldFrameArray[lowerIndex+1] == 0) && (this.oldFrameArray[lowerIndex + 2] == 255)) //is water
 			{
 				//set upper to black
 				this.setBlack(index);
 				
 				//set lower to merge result (saltwater)
-				this.data[lowerIndex] = 170;
-				this.data[lowerIndex+1] = 204;
-				this.data[lowerIndex+2] = 255;
+				this.newFrameArray[lowerIndex] = 170;
+				this.newFrameArray[lowerIndex+1] = 204;
+				this.newFrameArray[lowerIndex+2] = 255;
 			}
 			else
 			{
 				return false; //does not react with the first particle
 			}
 		}
-		else if((this.rawData[index] == 0) && (this.rawData[index+1] == 0) && (this.rawData[index + 2] == 255)) //is water
+		else if((this.oldFrameArray[index] == 0) && (this.oldFrameArray[index+1] == 0) && (this.oldFrameArray[index + 2] == 255)) //is water
 		{
-			if((this.rawData[lowerIndex] == 255) && (this.rawData[lowerIndex+1] == 255) && (this.rawData[lowerIndex + 2] == 255)) //is salt
+			if((this.oldFrameArray[lowerIndex] == 255) && (this.oldFrameArray[lowerIndex+1] == 255) && (this.oldFrameArray[lowerIndex + 2] == 255)) //is salt
 			{
 				//set upper to black
 				this.setBlack(index);
 				
 				//set lower to merge result (saltwater)
-				this.data[lowerIndex] = 170;
-				this.data[lowerIndex+1] = 204;
-				this.data[lowerIndex+2] = 255;
+				this.newFrameArray[lowerIndex] = 170;
+				this.newFrameArray[lowerIndex+1] = 204;
+				this.newFrameArray[lowerIndex+2] = 255;
 			}
 			else
 			{
@@ -512,61 +519,71 @@ app.main = {
 		if(oldArray[index+1] == 248)
 		{
 			var iabove = this.above(index);
-			if(this.positionExists(iabove-16))
+			if(this.isPlant(newArray, this.below(index)) || this.isPlant(newArray, this.below(index-4)) || this.isPlant(newArray, this.below(index+4)) || this.isPlant(newArray, this.below(index-8)) || this.isPlant(newArray, this.below(index+8)) || this.isSand(newArray, this.below(index)) || this.isSand(newArray, this.below(index-4)) || this.isSand(newArray, this.below(index+4)) || this.isSand(newArray, this.below(index-8)) || this.isSand(newArray, this.below(index+8)))
 			{
-				//count how many plant blocks are above this one within 7 squares
-				var plantCount = 0;
-				
-				if(this.isPlant(newArray, iabove)){plantCount++;}
-				if(this.isPlant(newArray, iabove-4)){plantCount++;}
-				if(this.isPlant(newArray, iabove+4)){plantCount++;}
-				if(plantCount < 3 && this.isPlant(newArray, iabove+8)){plantCount++;}
-				if(plantCount < 3 && this.isPlant(newArray, iabove-8)){plantCount++;}
-				if(plantCount < 3 && this.isPlant(newArray, iabove+12)){plantCount++;}
-				if(plantCount < 3 && this.isPlant(newArray, iabove-12)){plantCount++;}
-				if(plantCount < 3 && this.isPlant(newArray, iabove+16)){plantCount++;}
-				if(plantCount < 3 && this.isPlant(newArray, iabove-16)){plantCount++;}
-				
-				//grow if it's clear enough
-				if(plantCount < 2)
+				if(this.positionExists(iabove-16))
 				{
-					switch(Math.floor((Math.random() * 5)))
+					//count how many plant blocks are above this one within 7 squares
+					var plantCount = 0;
+					
+					if(this.isPlant(newArray, iabove)){plantCount++;}
+					if(this.isPlant(newArray, iabove-4)){plantCount++;}
+					if(this.isPlant(newArray, iabove+4)){plantCount++;}
+					if(plantCount < 3 && this.isPlant(newArray, iabove+8)){plantCount++;}
+					if(plantCount < 3 && this.isPlant(newArray, iabove-8)){plantCount++;}
+					if(plantCount < 3 && this.isPlant(newArray, iabove+12)){plantCount++;}
+					if(plantCount < 3 && this.isPlant(newArray, iabove-12)){plantCount++;}
+					if(plantCount < 3 && this.isPlant(newArray, iabove+16)){plantCount++;}
+					if(plantCount < 3 && this.isPlant(newArray, iabove-16)){plantCount++;}
+					
+					//grow if it's clear enough
+					if(plantCount < 2)
 					{
-						case 0:
-							if(this.isWater(newArray, iabove-4))
-							{
-								this.setPlant(iabove-4);
-							}
-						break;
-						
-						case 1:
-							if(this.isWater(newArray, iabove))
-							{
-								this.setPlant(iabove);
-							}
-						break;
-						
-						case 2:
-							if(this.isWater(newArray, iabove+4))
-							{
-								this.setPlant(iabove+4);
-							}
-						break;
-						
-						case 3:
-							if(this.isWater(newArray, iabove+8))
-							{
-								this.setPlant(iabove+8);
-							}
-						break;
-						
-						case 4:
-							if(this.isWater(newArray, iabove-8))
-							{
-								this.setPlant(iabove-8);
-							}
-						break;
+						switch(Math.floor((Math.random() * 5)))
+						{
+							case 0:
+								if(this.isWater(newArray, iabove-4))
+								{
+									this.setPlant(iabove-4);
+								}
+							break;
+							
+							case 1:
+								if(this.isWater(newArray, iabove))
+								{
+									this.setPlant(iabove);
+								}
+							break;
+							
+							case 2:
+								if(this.isWater(newArray, iabove+4))
+								{
+									this.setPlant(iabove+4);
+								}
+							break;
+							
+							case 3:
+								if(this.isWater(newArray, iabove+8))
+								{
+									this.setPlant(iabove+8);
+								}
+							break;
+							
+							case 4:
+								if(this.isWater(newArray, iabove-8))
+								{
+									this.setPlant(iabove-8);
+								}
+							break;
+						}
 					}
+				}
+			}
+			else
+			{
+				if(Math.floor((Math.random() * 2)) == 1)
+				{
+					this.setBiomass(index)
 				}
 			}
 		}
@@ -575,24 +592,39 @@ app.main = {
 	//clears space
 	setBlack: function(index)
 	{
-		this.data[index] = 0;
-		this.data[index+1] = 0;
-		this.data[index+2] = 0;
+		this.newFrameArray[index] = 0;
+		this.newFrameArray[index+1] = 0;
+		this.newFrameArray[index+2] = 0;
 	},
 	
 	//sets the block to plant
 	setPlant: function(index)
 	{
-		this.data[index] = 0;
-		this.data[index+1] = 248;
-		this.data[index+2] = 0;
+		this.newFrameArray[index] = 0;
+		this.newFrameArray[index+1] = 248;
+		this.newFrameArray[index+2] = 0;
+	},
+	
+	//sets the block to plant
+	setWater: function(index)
+	{
+		this.newFrameArray[index] = 0;
+		this.newFrameArray[index+1] = 0;
+		this.newFrameArray[index+2] = 255;
 	},
 	
 	setStone: function(index)
 	{
-		this.data[index] = 136;
-		this.data[index+1] = 136;
-		this.data[index+2] = 136;
+		this.newFrameArray[index] = 136;
+		this.newFrameArray[index+1] = 136;
+		this.newFrameArray[index+2] = 136;
+	},
+	
+	setBiomass: function(index)
+	{
+		this.newFrameArray[index] = 140;
+		this.newFrameArray[index+1] = 118;
+		this.newFrameArray[index+2] = 86;
 	},
 	
 	pauseGame: function()
@@ -656,7 +688,7 @@ app.main = {
 	
 	logScene: function()
 	{
-		console.log(this.rawData);
+		console.log(this.oldFrameArray);
 	}
 
 }; // end app.main
