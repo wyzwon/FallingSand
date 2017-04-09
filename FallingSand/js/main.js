@@ -17,7 +17,7 @@ app.main = {
     WIDTH : 0,
 	HEIGHT: 400,
 	MAXWIDTH : 600, // max possible width
-	PREFEREDWIDTH : Math.floor(window.innerWidth) - 32,
+	PREFEREDWIDTH : Math.floor(window.innerWidth) - getScrollBarWidth(),
 	WIDTHPIX: undefined,
 	HEIGHTPIX: undefined,
     canvas: undefined,
@@ -289,7 +289,7 @@ app.main = {
 		return(newFrameArray[indexLocation] == 235);
 	},
 	
-	isBiomass: function(newFrameArray, indexLocation)
+	isDeadPlant: function(newFrameArray, indexLocation)
 	{
 		return(newFrameArray[indexLocation] == 140);
 	},
@@ -364,7 +364,7 @@ app.main = {
 	// returns true if this particle behaves like a fluid
 	isFluid: function(index,array)
 	{
-		return (!(this.isStone(array, index) || this.isBlack(array, index) || this.isBiomass(array, index) || this.isPlant(array, index))); //hex 88 -> dec 136 stone, hex f8 -> dec 248 plant
+		return (!(this.isStone(array, index) || this.isBlack(array, index) || this.isDeadPlant(array, index) || this.isPlant(array, index))); //hex 88 -> dec 136 stone, hex f8 -> dec 248 plant
 	},
 	
 	// returns true if the particle is fluid or void
@@ -375,7 +375,6 @@ app.main = {
 	
 	getDensity: function(rValue, gValue, bValue)
 	{
-		
 		if((rValue > 0) && (rValue < 255))
 		{
 			if(rValue == 235)//sand //hex EB == dec 235
@@ -445,7 +444,6 @@ app.main = {
 	// atempt to merge two material cells into a different material
 	tryMerge: function(index,lowerIndex)
 	{
-		
 		//determine the first object and compare the second to its list of reactants then reacts if able
 		if((this.oldFrameArray[index] == 255) && (this.oldFrameArray[index+1] == 255) && (this.oldFrameArray[index + 2] == 255)) //is salt
 		{
@@ -558,7 +556,7 @@ app.main = {
 			{
 				if(Math.floor((Math.random() * 2)) == 1)
 				{
-					this.setBiomass(index)
+					this.setdeadPlant(index)
 				}
 			}
 		}
@@ -595,7 +593,7 @@ app.main = {
 		this.newFrameArray[index+2] = 136;
 	},
 	
-	setBiomass: function(index)
+	setdeadPlant: function(index)
 	{
 		this.newFrameArray[index] = 140;
 		this.newFrameArray[index+1] = 118;
@@ -650,7 +648,7 @@ app.main = {
 		this.ctx.fillStyle = "#0000ff";
 		this.ctx.fillRect(0, 0, this.WIDTH, this.HEIGHT);
 		this.ctx.fillStyle = "#EBEFA0";
-		var sandfloor = Math.floor(this.HEIGHT / 7 * 6)
+		var sandfloor = Math.floor(this.HEIGHT / 7 * 6);
 		this.ctx.fillRect(0, sandfloor, this.WIDTH, this.HEIGHT);
 		this.ctx.fillStyle = "#00f800";
 		

@@ -23,6 +23,7 @@ Thomas Bouffard
 
 ## Acknowledgments
 * Tony Jefferson - whos lessons and examples helped show me how to set up the encompassing enviornment.
+* Alexandre Gomes - For his [getScrollBarWidth] (http://www.alexandre-gomes.com/?p=115) function.
 
 ## Note on commit statistics
 The repository stats state that I released 25 commits the say I made the project,
