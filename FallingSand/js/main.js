@@ -280,7 +280,19 @@ app.main = {
 	// check if the cell is plant
 	isPlant: function(newFrameArray, indexLocation)
 	{
+		return(newFrameArray[indexLocation+1] == 248 || newFrameArray[indexLocation+1] == 247);
+	},
+	
+	// check if the cell is plant
+	isSeaweed: function(newFrameArray, indexLocation)
+	{
 		return(newFrameArray[indexLocation+1] == 248);
+	},
+	
+	// check in the cell is dyingPlant
+	isDyingSeaweed: function(newFrameArray, indexLocation)
+	{
+		return(newFrameArray[indexLocation+1] == 247);
 	},
 	
 	// check if the cell is sand
@@ -289,11 +301,13 @@ app.main = {
 		return(newFrameArray[indexLocation] == 235);
 	},
 	
+	// check if the cell is deadPlant
 	isDeadPlant: function(newFrameArray, indexLocation)
 	{
 		return(newFrameArray[indexLocation] == 140);
 	},
 	
+	// check if the cell is stone
 	isStone: function(newFrameArray, indexLocation)
 	{
 		return(newFrameArray[indexLocation] == 136);
@@ -364,7 +378,7 @@ app.main = {
 	// returns true if this particle behaves like a fluid
 	isFluid: function(index,array)
 	{
-		return (!(this.isStone(array, index) || this.isBlack(array, index) || this.isDeadPlant(array, index) || this.isPlant(array, index))); //hex 88 -> dec 136 stone, hex f8 -> dec 248 plant
+		return (!(this.isStone(array, index) || this.isBlack(array, index) || this.isDeadPlant(array, index) || this.isPlant(array, index) || this.isDyingSeaweed(array, index))); //hex 88 -> dec 136 stone, hex f8 -> dec 248 seaweed, hex f7 -> dec 247 dyingSeaweed
 	},
 	
 	// returns true if the particle is fluid or void
@@ -489,14 +503,18 @@ app.main = {
 	// check that the index is a plant and attempt to grow given the right conditions
 	plantGrow: function(oldArray, newArray, index)
 	{
-		if(oldArray[index+1] == 248)
+		if(this.isSeaweed(oldArray, index))
 		{
+			
 			var iabove = this.above(index);
-			if(this.isPlant(newArray, this.below(index)) || this.isPlant(newArray, this.below(index-4)) || this.isPlant(newArray, this.below(index+4)) || this.isPlant(newArray, this.below(index-8)) || this.isPlant(newArray, this.below(index+8)) || this.isSand(newArray, this.below(index)) || this.isSand(newArray, this.below(index-4)) || this.isSand(newArray, this.below(index+4)) || this.isSand(newArray, this.below(index-8)) || this.isSand(newArray, this.below(index+8)))
+			// test if any of the cells under the current one are seaweed or sand
+			if(this.isSeaweed(newArray, this.below(index)) || this.isSeaweed(newArray, this.below(index-4)) || this.isSeaweed(newArray, this.below(index+4)) || this.isSeaweed(newArray, this.below(index-8)) || this.isSeaweed(newArray, this.below(index+8)) || this.isSeaweed(newArray, this.below(index)) || this.isSand(newArray, this.below(index-4)) || this.isSand(newArray, this.below(index+4)) || this.isSand(newArray, this.below(index-8)) || this.isSand(newArray, this.below(index+8)))
 			{
+				// is the plant growth assured to be in the array bounds
 				if(this.positionExists(iabove-16))
 				{
-					//count how many plant blocks are above this one within 7 squares
+					// count how many plant blocks are above this one within 7 squares
+					// Note: this has to be plant and not seaweed or new growth will sprout even as the plant is dying
 					var plantCount = 0;
 					
 					if(this.isPlant(newArray, iabove)){plantCount++;}
@@ -517,35 +535,35 @@ app.main = {
 							case 0:
 								if(this.isWater(newArray, iabove-4))
 								{
-									this.setPlant(iabove-4);
+									this.setSeaweed(iabove-4);
 								}
 							break;
 							
 							case 1:
 								if(this.isWater(newArray, iabove))
 								{
-									this.setPlant(iabove);
+									this.setSeaweed(iabove);
 								}
 							break;
 							
 							case 2:
 								if(this.isWater(newArray, iabove+4))
 								{
-									this.setPlant(iabove+4);
+									this.setSeaweed(iabove+4);
 								}
 							break;
 							
 							case 3:
 								if(this.isWater(newArray, iabove+8))
 								{
-									this.setPlant(iabove+8);
+									this.setSeaweed(iabove+8);
 								}
 							break;
 							
 							case 4:
 								if(this.isWater(newArray, iabove-8))
 								{
-									this.setPlant(iabove-8);
+									this.setSeaweed(iabove-8);
 								}
 							break;
 						}
@@ -556,7 +574,17 @@ app.main = {
 			{
 				if(Math.floor((Math.random() * 2)) == 1)
 				{
-					this.setdeadPlant(index)
+					this.setDyingSeaweed(index);
+				}
+			}
+		}
+		else if(this.isDyingSeaweed(oldArray, index))
+		{
+			if(this.isSeaweed(newArray, this.below(index)) || this.isSeaweed(newArray, this.below(index-4)) || this.isSeaweed(newArray, this.below(index+4)) || this.isSeaweed(newArray, this.below(index-8)) || this.isSeaweed(newArray, this.below(index+8)) || this.isSeaweed(newArray, this.below(index)) || this.isSand(newArray, this.below(index-4)) || this.isSand(newArray, this.below(index+4)) || this.isSand(newArray, this.below(index-8)) || this.isSand(newArray, this.below(index+8)))
+			{
+				if(Math.floor((Math.random() * 2)) == 1)
+				{
+					this.setSeaweed(index);
 				}
 			}
 		}
@@ -570,15 +598,23 @@ app.main = {
 		this.newFrameArray[index+2] = 0;
 	},
 	
-	//sets the block to plant
-	setPlant: function(index)
+	// sets the block to seaweed
+	setSeaweed: function(index)
 	{
 		this.newFrameArray[index] = 0;
 		this.newFrameArray[index+1] = 248;
 		this.newFrameArray[index+2] = 0;
 	},
 	
-	//sets the block to plant
+	// sets the block to dyingSeaweed
+	setDyingSeaweed: function(index)
+	{
+		this.newFrameArray[index] = 250; //50
+		this.newFrameArray[index+1] = 247;
+		this.newFrameArray[index+2] = 0;
+	},
+	
+	// sets the block to water
 	setWater: function(index)
 	{
 		this.newFrameArray[index] = 0;
@@ -586,6 +622,7 @@ app.main = {
 		this.newFrameArray[index+2] = 255;
 	},
 	
+	// sets the block to stone
 	setStone: function(index)
 	{
 		this.newFrameArray[index] = 136;
@@ -593,7 +630,8 @@ app.main = {
 		this.newFrameArray[index+2] = 136;
 	},
 	
-	setdeadPlant: function(index)
+	// sets the block to deadPlant
+	setDeadPlant: function(index)
 	{
 		this.newFrameArray[index] = 140;
 		this.newFrameArray[index+1] = 118;
@@ -652,7 +690,7 @@ app.main = {
 		this.ctx.fillRect(0, sandfloor, this.WIDTH, this.HEIGHT);
 		this.ctx.fillStyle = "#00f800";
 		
-		// place plants on sand bed spaced at 1/3 and 2/3 width of the scene
+		// place seaweed on sand bed spaced at 1/3 and 2/3 width of the scene
 		// note: dimensions must be an even integer in length or they are automatically anti-aliased
 		this.ctx.fillRect(Math.floor(this.WIDTH / 4 * 3), sandfloor, 2, 2); 
 		this.ctx.fillRect(Math.floor(this.WIDTH / 4), sandfloor, 2, 2);
